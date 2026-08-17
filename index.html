@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Farm — Fresh From Our Backyard</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">A Farm</div>
+      <div class="search-wrap">
+        <input id="searchInput" type="text" placeholder="Search products..." />
+      </div>
+    </div>
+    <nav id="categoryNav" class="category-nav">
+      <!-- categories injected by app.js -->
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>A Family-Owned Backyard Farm</h1>
+      <p>Grown by hand in Virginia. Real produce, real people, real farm.</p>
+      <p class="hero-note">Farm name: INFORMATION NEEDED</p>
+    </div>
+    <div class="hero-media-note">
+      Real farm photo/video coming soon
+    </div>
+  </section>
+
+  <!-- PRODUCT GRID -->
+  <main class="main">
+    <div id="resultsCount" class="results-count"></div>
+    <section id="productGrid" class="product-grid">
+      <!-- product cards injected by app.js -->
+    </section>
+    <p id="noResults" class="no-results" hidden>No products match your search.</p>
+  </main>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div id="productModal" class="modal" hidden>
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card">
+      <button id="modalClose" class="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-media-placeholder" id="modalMedia">Real photo coming soon</div>
+      <h2 id="modalName"></h2>
+      <p id="modalCategory" class="modal-category"></p>
+      <p id="modalPrice" class="modal-price"></p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>A Farm — Virginia, USA</p>
+    <p class="footer-note">Prices shown are per the current farm price list. Availability may vary by season.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
