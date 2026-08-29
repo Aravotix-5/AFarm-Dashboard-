@@ -13,7 +13,6 @@ const CATEGORIES = [
   { key: "peppers",    label: "Peppers & Chilies",  emoji: "🌶️" },
   { key: "root",       label: "Root Vegetables",    emoji: "🥕" },
   { key: "squash",     label: "Squash & Zucchini",  emoji: "🥒" },
-  { key: "gourds",     label: "Gourds",              emoji: "🧺" },
   { key: "beans",      label: "Beans",               emoji: "🫘" },
   { key: "okra",       label: "Okra",                emoji: "🌾" },
   { key: "potatoes",   label: "Potatoes",            emoji: "🥔" },
@@ -37,8 +36,8 @@ function categoryLabel(key){
 --------------------------------------------------------------------- */
 const PRODUCTS = [
   // ---- TOMATOES ----
-  { id:"tom-cherry",  name:"Cherry Tomatoes",         category:"tomatoes", price:5.99, unit:"lb",     available:true, featured:true,  basketEligible:true, basketSpace:2 },
-  { id:"tom-bigboy",  name:"Big Boy Tomatoes",        category:"tomatoes", price:4.99, unit:"lb",     available:true, basketEligible:true, basketSpace:2 },
+  { id:"tom-cherry",  name:"Cherry Tomatoes",         category:"tomatoes", price:5.99, unit:"lb",     available:true, featured:true,  basketEligible:true, basketSpace:2, image:"media/images/cherry-tomatoes-vine.jpg", video:"media/videos/cherry-tomato-harvest.mp4" },
+  { id:"tom-bigboy",  name:"Big Boy Tomatoes",        category:"tomatoes", price:4.99, unit:"lb",     available:true, basketEligible:true, basketSpace:2, image:"media/images/tomato-ripening.jpg", video:"media/videos/tomato-ripening.mp4" },
   { id:"tom-long",    name:"Long Tomatoes",           category:"tomatoes", price:5.49, unit:"lb",     available:true, basketEligible:true, basketSpace:2 },
   { id:"tom-jelly",   name:"Jelly Bean Hybrid Tomatoes", category:"tomatoes", price:6.49, unit:"lb",  available:true, basketEligible:true, basketSpace:2 },
 
@@ -47,7 +46,6 @@ const PRODUCTS = [
   { id:"pep-jalapeno", name:"Jalapeño",           category:"peppers", price:4.99, unit:"lb", available:true, featured:true, basketEligible:true, basketSpace:1 },
   { id:"pep-indian",   name:"Indian Chili",       category:"peppers", price:7.49, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
   { id:"pep-bell",     name:"Sweet Bell Pepper",  category:"peppers", price:4.99, unit:"lb", available:true, featured:true, basketEligible:true, basketSpace:1 },
-  { id:"pep-hotmix",   name:"Hot Pepper Mix",     category:"peppers", price:6.99, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
   { id:"pep-habanero", name:"Habanero",           category:"peppers", price:8.99, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
   { id:"pep-green",    name:"Green Chili",        category:"peppers", price:null, unit:"lb", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
 
@@ -57,7 +55,7 @@ const PRODUCTS = [
   { id:"veg-cauliflower",name:"Cauliflower",           category:"vegetables", price:5.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
   { id:"veg-cucumber",   name:"Cucumber",              category:"vegetables", price:3.99, unit:"lb", available:true, featured:true, basketEligible:true, basketSpace:2 },
   { id:"veg-lettuce",    name:"Lettuce Varieties",     category:"vegetables", price:null, unit:"lb", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"veg-cabbage",    name:"Cabbage",               category:"vegetables", price:null, unit:"lb", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
+  { id:"veg-cabbage",    name:"Cabbage",               category:"vegetables", price:null, unit:"lb", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false, image:"media/images/cabbage-head.jpg", video:"media/videos/cabbage-harvest.mp4" },
 
   // ---- ONIONS & GARLIC (organized under Vegetables) ----
   { id:"veg-garlic-mex",   name:"Mexican Garlic",     category:"vegetables", price:8.99, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
@@ -67,21 +65,20 @@ const PRODUCTS = [
   { id:"veg-onion-texas",  name:"Texas Yellow Onion", category:"vegetables", price:4.49, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
 
   // ---- EGGPLANT (organized under Vegetables) ----
-  { id:"veg-bangon",   name:"Bangon / Eggplant", category:"vegetables", price:5.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
-  { id:"veg-eggplant", name:"Eggplant",          category:"vegetables", price:4.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
+  { id:"veg-eggplant", name:"Eggplant",          category:"vegetables", price:4.99, unit:"lb", available:true, basketEligible:true, basketSpace:2, image:"media/images/eggplant-plant.jpg", video:"media/videos/eggplant-harvest.mp4" },
 
   // ---- SQUASH & ZUCCHINI ----
   { id:"sq-yellow",   name:"Yellow Squash",        category:"squash", price:3.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
   { id:"sq-summer",   name:"Summer Squash",        category:"squash", price:3.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
-  { id:"sq-bottle",   name:"Bottle Gourd",         category:"squash", price:5.99, unit:"each", available:true, basketEligible:true, basketSpace:4 },
+  { id:"sq-bottle",   name:"Bottle Gourd",         category:"squash", price:5.99, unit:"each", available:true, basketEligible:true, basketSpace:4, image:"media/images/bottle-gourd-single.jpg", video:"media/videos/bottle-gourd-harvest.mp4" },
   { id:"zuc-american",name:"American Zucchini",    category:"squash", price:3.99, unit:"lb", available:true, seasonal:true, basketEligible:true, basketSpace:2 },
   { id:"zuc-indian",  name:"Indian Zucchini",       category:"squash", price:4.49, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
   { id:"zuc-darkgreen",name:"Dark Green Zucchini",  category:"squash", price:3.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
   { id:"zuc-black",   name:"Black Zucchini",        category:"squash", price:4.49, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
 
   // ---- GOURDS ----
-  { id:"gou-cese",   name:"Cese Loofah Gourd",      category:"gourds", price:4.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
-  { id:"gou-asian",  name:"Early Asian Loofah",     category:"gourds", price:4.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
+  // (Cese Loofah Gourd and Early Asian Loofah removed — not actually grown/sold.
+  //  Bottle Gourd lives under Squash & Zucchini below.)
 
   // ---- ROOT VEGETABLES ----
   { id:"root-carrot", name:"Carrot",     category:"root", price:3.99, unit:"lb", available:true, featured:true, basketEligible:true, basketSpace:2 },
@@ -116,14 +113,14 @@ const PRODUCTS = [
 
   // ---- OKRA ----
   { id:"okra-crimson", name:"Crimson Okra", category:"okra", price:5.99, unit:"lb", available:true, seasonal:true, basketEligible:true, basketSpace:2 },
-  { id:"okra-emerald", name:"Emerald Okra", category:"okra", price:5.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
+  { id:"okra-emerald", name:"Emerald Okra", category:"okra", price:5.99, unit:"lb", available:true, basketEligible:true, basketSpace:2, image:"media/images/okra-pods.jpg", video:"media/videos/okra-harvest.mp4" },
 
   // ---- POTATOES ----
   { id:"pot-red",   name:"Red Potatoes",   category:"potatoes", price:3.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
   { id:"pot-white", name:"White Potatoes", category:"potatoes", price:3.99, unit:"lb", available:true, basketEligible:true, basketSpace:2 },
 
   // ---- BEANS ----
-  { id:"bean-green", name:"Green Beans",         category:"beans", price:4.99, unit:"lb", available:true, seasonal:true, basketEligible:true, basketSpace:1 },
+  { id:"bean-green", name:"Green Beans",         category:"beans", price:4.99, unit:"lb", available:true, seasonal:true, basketEligible:true, basketSpace:1, image:"media/images/green-beans-harvest.jpg", video:"media/videos/green-beans-harvest.mp4" },
   { id:"bean-lima",  name:"Lima Beans",          category:"beans", price:5.99, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
   { id:"bean-guar",  name:"Guar Cluster Beans",  category:"beans", price:5.99, unit:"lb", available:true, basketEligible:true, basketSpace:1 },
 
@@ -145,33 +142,26 @@ const PRODUCTS = [
   { id:"fl-bundles",   name:"Flower Bundles",         category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
 
   // ---- BASKETS ----
-  { id:"basket-custom", name:"Farm Basket (You Choose the Price)", category:"baskets", price:null, priceNote:"Starts at $10 — you pick the price", unit:"basket", available:true, basketEligible:false, isBasketProduct:true }
+  { id:"basket-30", name:"$30 Farm Basket", category:"baskets", price:30, unit:"basket", available:true, basketEligible:false, isBasketProduct:true }
 ];
 
 const PRODUCT_MAP = {};
 PRODUCTS.forEach(p => PRODUCT_MAP[p.id] = p);
 
-/* Basket price is customer-adjustable. Capacity scales with price:
-   every DOLLARS_PER_SPACE dollars buys one space of room, rounded,
-   with a sensible floor so a tiny basket still holds something. */
-const DOLLARS_PER_SPACE = 3;
-const MIN_BASKET_PRICE = 10;
-const BASKET_PRICE_STEP = 5;
-const DEFAULT_BASKET_PRICE = 30;
-const MIN_BASKET_CAPACITY = 3;
+/* The $30 Farm Basket is a fixed flat price — not customer-adjustable.
+   Capacity is a fixed 10 spaces (see BASKET_CAPACITY below). */
+const BASKET_PRICE = 30;
+const BASKET_CAPACITY = 10;
 
 function basketCapacity(){
-  return Math.max(MIN_BASKET_CAPACITY, Math.round(state.basketPrice / DOLLARS_PER_SPACE));
+  return BASKET_CAPACITY;
 }
 
-/* Loyalty rewards ladder — starter config, easy to change later.
-   1 point = $1 spent, awarded when an order is submitted. */
-const REWARD_TIERS = [
-  { points: 50,  reward: "$5 off your next visit" },
-  { points: 100, reward: "$10 off your next visit" },
-  { points: 200, reward: "A free item from Herbs & Leaves" },
-  { points: 300, reward: "$25 off your next Farm Basket" }
-];
+/* Loyalty rewards ladder — intentionally empty. The farm hasn't set
+   reward rules yet, so we track points but don't invent what they're
+   worth. Add tiers here once the farm decides, e.g.:
+   { points: 100, reward: "$10 off your next visit" } */
+const REWARD_TIERS = [];
 
 /* ---------------------------------------------------------------------
    STATE + LOCAL STORAGE
@@ -179,7 +169,7 @@ const REWARD_TIERS = [
 const state = {
   cart: loadJSON("afarm_cart", []),        // [{id, qty}]
   basket: loadJSON("afarm_basket", []),    // [{id, qty}]
-  basketPrice: loadJSON("afarm_basketPrice", DEFAULT_BASKET_PRICE),
+  basketPrice: BASKET_PRICE,
   account: loadJSON("afarm_account", { name: "", phone: "", points: 0, history: [] }),
   recentlyViewed: loadJSON("afarm_recent", []),
   view: "home",
@@ -198,7 +188,6 @@ function saveState(){
   try{
     localStorage.setItem("afarm_cart", JSON.stringify(state.cart));
     localStorage.setItem("afarm_basket", JSON.stringify(state.basket));
-    localStorage.setItem("afarm_basketPrice", JSON.stringify(state.basketPrice));
     localStorage.setItem("afarm_account", JSON.stringify(state.account));
     localStorage.setItem("afarm_recent", JSON.stringify(state.recentlyViewed));
   }catch(e){ /* localStorage unavailable — app still works, just won't persist */ }
@@ -220,6 +209,32 @@ function isAvailable(p){
 
 function mediaPlaceholderText(p){
   return "Photo coming soon";
+}
+
+/* Fills a container with the product's real photo/video when available,
+   autoplaying muted video if present, falling back to a text placeholder. */
+function fillMediaEl(container, p, opts){
+  opts = opts || {};
+  container.innerHTML = "";
+  if(p.video){
+    const v = document.createElement("video");
+    v.src = p.video;
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.autoplay = true;
+    v.setAttribute("aria-label", p.name);
+    if(opts.controls) v.controls = true;
+    container.appendChild(v);
+  } else if(p.image){
+    const img = document.createElement("img");
+    img.src = p.image;
+    img.alt = p.name;
+    img.loading = "lazy";
+    container.appendChild(img);
+  } else {
+    container.appendChild(el("span", "media-placeholder", mediaPlaceholderText(p)));
+  }
 }
 
 function el(tag, className, html){
@@ -247,7 +262,7 @@ function buildProductCard(p){
   card.setAttribute("aria-label", "View " + p.name);
 
   const media = el("div", "product-media");
-  media.appendChild(el("span", "media-placeholder", mediaPlaceholderText(p)));
+  fillMediaEl(media, p);
   if(!isAvailable(p)){
     const badge = el("span", "unavailable-badge", p.availabilityNote ? "Ask at farm" : "Unavailable");
     media.appendChild(badge);
@@ -277,18 +292,29 @@ function buildProductCard(p){
   info.appendChild(addBtn);
   card.appendChild(info);
 
-  card.addEventListener("click", () => { if(p.isBasketProduct){ location.hash = "#basket"; } else { openDetail(p.id); } });
-  card.addEventListener("keydown", (e) => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); if(p.isBasketProduct){ location.hash = "#basket"; } else { openDetail(p.id); } } });
+  card.addEventListener("click", () => { if(p.isBasketProduct){ location.hash = "#basket"; } else { openProductPage(p.id); } });
+  card.addEventListener("keydown", (e) => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); if(p.isBasketProduct){ location.hash = "#basket"; } else { openProductPage(p.id); } } });
 
   return card;
 }
 
 /* ---------------------------------------------------------------------
    VIEW ROUTING
+   Most routes are plain view names (#shop, #cart, ...). Product pages
+   use a two-part hash, #product/<id>, so each item is a real linkable
+   page rather than a popup.
 --------------------------------------------------------------------- */
-const VIEW_IDS = ["home","shop","flowers","basket","cart","account","about"];
+const VIEW_IDS = ["home","shop","flowers","basket","cart","account","about","product"];
 
-function goToView(view){
+function currentRoute(){
+  const raw = (location.hash || "#home").replace(/^#/, "");
+  if(raw.indexOf("product/") === 0){
+    return { view: "product", id: raw.slice("product/".length) };
+  }
+  return { view: VIEW_IDS.includes(raw) ? raw : "home", id: null };
+}
+
+function goToView(view, productId){
   if(!VIEW_IDS.includes(view)) view = "home";
   state.view = view;
   VIEW_IDS.forEach(v => {
@@ -299,21 +325,22 @@ function goToView(view){
   });
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   closeNavDrawer();
-  renderCurrentView();
+  renderCurrentView(productId);
 }
 
-function renderCurrentView(){
+function renderCurrentView(productId){
   if(state.view === "home") renderHome();
   if(state.view === "shop") renderShop();
   if(state.view === "flowers") renderFlowers();
   if(state.view === "basket") renderBasketView();
   if(state.view === "cart") renderCartView();
-  if(state.view === "account") renderAccountView();
+  if(state.view === "account") { renderAccountView(); refreshAccountFromServer(); }
+  if(state.view === "product") renderProductPage(productId);
 }
 
 window.addEventListener("hashchange", () => {
-  const view = (location.hash || "#home").replace("#", "");
-  goToView(view);
+  const route = currentRoute();
+  goToView(route.view, route.id);
 });
 
 /* ---------------------------------------------------------------------
@@ -368,8 +395,9 @@ function renderShopFilters(){
   const row = document.getElementById("filterRow");
   row.innerHTML = "";
   SHOP_FILTER_GROUPS.forEach(f => {
-    const chip = el("button", "filter-chip" + (state.shopFilter === f.key ? " active" : ""), f.label);
-    chip.addEventListener("click", () => { state.shopFilter = f.key; renderShop(); });
+    const isActive = !state.searchTerm && state.shopFilter === f.key;
+    const chip = el("button", "filter-chip" + (isActive ? " active" : ""), f.label);
+    chip.addEventListener("click", () => { state.shopFilter = f.key; state.searchTerm = ""; document.getElementById("searchInput").value = ""; renderShop(); });
     row.appendChild(chip);
   });
 }
@@ -377,7 +405,7 @@ function renderShopFilters(){
 function matchesShopFilter(p){
   if(state.shopFilter === "all") return true;
   if(state.shopFilter === "vegetables"){
-    return ["vegetables","tomatoes","peppers","root","squash","gourds","beans","okra","potatoes"].includes(p.category);
+    return ["vegetables","tomatoes","peppers","root","squash","beans","okra","potatoes"].includes(p.category);
   }
   return p.category === state.shopFilter;
 }
@@ -388,12 +416,20 @@ function matchesSearch(p){
   return p.name.toLowerCase().includes(term) || categoryLabel(p.category).toLowerCase().includes(term);
 }
 
+/* A search typed in the header box searches the whole catalog —
+   it overrides whatever category chip happens to be active, rather
+   than staying scoped to it. */
+function matchesShopFilterOrSearch(p){
+  if(state.searchTerm) return matchesSearch(p);
+  return matchesShopFilter(p) && matchesSearch(p);
+}
+
 function renderShop(){
   renderShopFilters();
   const container = document.getElementById("shopCategories");
   container.innerHTML = "";
 
-  const visible = PRODUCTS.filter(p => matchesShopFilter(p) && matchesSearch(p));
+  const visible = PRODUCTS.filter(matchesShopFilterOrSearch);
 
   const info = document.getElementById("resultsInfo");
   if(state.searchTerm){
@@ -441,22 +477,29 @@ document.getElementById("searchInput").addEventListener("input", (e) => {
 });
 
 /* ---------------------------------------------------------------------
-   PRODUCT DETAIL SHEET
+   PRODUCT PAGE
+   Reached via #product/<id> — a real, linkable, bookmarkable "page" for
+   each item. (A static site with no server can't do a clean /product/x
+   path without a host rewrite, so the hash is the direct equivalent —
+   same shareable link behavior, no backend required.)
 --------------------------------------------------------------------- */
-function openDetail(id){
+function openProductPage(id){
+  location.hash = "#product/" + id;
+}
+
+function renderProductPage(id){
   const p = PRODUCT_MAP[id];
-  if(!p) return;
+  if(!p){ location.hash = "#shop"; return; }
 
   addRecentlyViewed(id);
 
-  document.getElementById("detailCategory").textContent = categoryLabel(p.category);
-  document.getElementById("detailName").textContent = p.name;
+  document.getElementById("productPageCategory").textContent = categoryLabel(p.category);
+  document.getElementById("productPageName").textContent = p.name;
 
-  const priceEl = document.getElementById("detailPrice");
   const pl = priceLabel(p);
-  priceEl.textContent = pl ? pl : (p.priceNote || "Price available at farm");
+  document.getElementById("productPagePrice").textContent = pl ? pl : (p.priceNote || "Price available at farm");
 
-  const availEl = document.getElementById("detailAvailability");
+  const availEl = document.getElementById("productPageAvailability");
   if(isAvailable(p)){
     availEl.textContent = "Available now";
     availEl.style.color = "var(--leaf)";
@@ -465,24 +508,20 @@ function openDetail(id){
     availEl.style.color = "var(--ink-soft)";
   }
 
-  const media = document.getElementById("detailMedia");
-  media.innerHTML = "";
-  media.appendChild(document.createTextNode(mediaPlaceholderText(p)));
+  fillMediaEl(document.getElementById("productPageMedia"), p, { controls: !!p.video });
 
-  const addBtn = document.getElementById("detailAddBtn");
+  const addBtn = document.getElementById("productPageAddBtn");
   addBtn.disabled = !isAvailable(p) || p.price == null;
   addBtn.textContent = addBtn.disabled ? "Ask at Farm" : "Add to Cart";
-  addBtn.onclick = () => { addToCart(p.id, 1); closeDetail(); };
+  addBtn.onclick = () => addToCart(p.id, 1);
 
-  document.getElementById("detailScrim").classList.add("open");
-  document.getElementById("detailSheet").classList.add("open");
+  document.title = p.name + " — A Farm";
 }
-function closeDetail(){
-  document.getElementById("detailScrim").classList.remove("open");
-  document.getElementById("detailSheet").classList.remove("open");
-}
-document.getElementById("detailScrim").addEventListener("click", closeDetail);
-document.getElementById("detailCloseBtn").addEventListener("click", closeDetail);
+
+document.getElementById("productBackBtn").addEventListener("click", () => {
+  if(document.referrer || history.length > 1){ history.back(); }
+  else { location.hash = "#shop"; }
+});
 
 function addRecentlyViewed(id){
   state.recentlyViewed = [id, ...state.recentlyViewed.filter(x => x !== id)].slice(0, 12);
@@ -550,7 +589,7 @@ function buildCartLine(l, context){
   const line = el("div", "cart-line");
 
   const media = el("div", "cart-line-media");
-  media.appendChild(el("span", "media-placeholder", ""));
+  fillMediaEl(media, p);
   line.appendChild(media);
 
   const info = el("div", "cart-line-info");
@@ -704,20 +743,6 @@ function addToBasket(id){
   toast(p.name + " added to your basket");
 }
 
-/* Changing the basket price is blocked if it would shrink capacity
-   below what's already sitting in the basket — remove items first. */
-function setBasketPrice(newPrice){
-  newPrice = Math.max(MIN_BASKET_PRICE, Math.round(newPrice / BASKET_PRICE_STEP) * BASKET_PRICE_STEP || MIN_BASKET_PRICE);
-  const wouldBeCapacity = Math.max(MIN_BASKET_CAPACITY, Math.round(newPrice / DOLLARS_PER_SPACE));
-  if(wouldBeCapacity < basketSpaceUsed()){
-    toast("Remove some items before lowering the price");
-    document.getElementById("basketPriceInput").value = state.basketPrice;
-    return;
-  }
-  state.basketPrice = newPrice;
-  saveState();
-  renderBasketView();
-}
 function removeFromBasket(id){
   const existing = state.basket.find(l => l.id === id);
   if(!existing) return;
@@ -744,9 +769,6 @@ function renderBasketView(){
   const used = basketSpaceUsed();
   const remaining = Math.max(0, capacity - used);
   const pct = Math.min(100, Math.round((used / capacity) * 100));
-
-  document.getElementById("basketPriceInput").value = state.basketPrice;
-  document.getElementById("basketCapacityNote").textContent = "$" + state.basketPrice + " gets you " + capacity + " space" + (capacity===1?"":"s") + " of room.";
 
   document.getElementById("basketMeterFill").style.width = pct + "%";
   document.getElementById("basketMeterWrap").setAttribute("aria-valuenow", String(used));
@@ -808,13 +830,76 @@ function renderBasketView(){
 
 document.getElementById("reviewBasketBtn").addEventListener("click", openOrderSummary);
 
-document.getElementById("basketPriceMinus").addEventListener("click", () => setBasketPrice(state.basketPrice - BASKET_PRICE_STEP));
-document.getElementById("basketPricePlus").addEventListener("click", () => setBasketPrice(state.basketPrice + BASKET_PRICE_STEP));
-document.getElementById("basketPriceInput").addEventListener("change", (e) => setBasketPrice(Number(e.target.value) || DEFAULT_BASKET_PRICE));
-
 /* ---------------------------------------------------------------------
    LOYALTY ACCOUNT
 --------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------
+   BACKEND API (optional, best-effort)
+   If server/server.js is running, orders/points/status sync to SQLite
+   and persist across devices. If it isn't (e.g. the site is just
+   opened as a static file), every call below fails silently and the
+   app keeps working exactly as it did before — local-only, on-device.
+--------------------------------------------------------------------- */
+function getCustomerKey(){
+  let key = localStorage.getItem("afarm_customer_key");
+  if(!key){
+    key = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("cust-" + Date.now() + "-" + Math.random().toString(16).slice(2));
+    try{ localStorage.setItem("afarm_customer_key", key); }catch(e){ /* ignore */ }
+  }
+  return key;
+}
+const CUSTOMER_KEY = getCustomerKey();
+
+/* Cloudflare Worker API base — paste your deployed Worker URL here
+   after running `wrangler deploy` (see cf-worker/README.md). Example:
+   "https://afarm-api.yourname.workers.dev" */
+const API_BASE = "PASTE_YOUR_WORKER_URL_HERE";
+
+function apiUrl(path){
+  return (API_BASE && !API_BASE.startsWith("PASTE_")) ? API_BASE + path : path;
+}
+
+async function apiGet(path){
+  try{
+    const res = await fetch(apiUrl(path));
+    if(!res.ok) return null;
+    return await res.json();
+  }catch(e){ return null; }
+}
+async function apiSend(path, method, body){
+  try{
+    const res = await fetch(apiUrl(path), {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok) return null;
+    return await res.json();
+  }catch(e){ return null; }
+}
+
+/* Pulls this device's points + order history (with live status) from
+   the server, if reachable, and re-renders the account view. */
+async function refreshAccountFromServer(){
+  const customer = await apiGet("/api/customers/" + encodeURIComponent(CUSTOMER_KEY));
+  if(customer){
+    state.account.points = customer.points;
+    if(customer.name) state.account.name = customer.name;
+    if(customer.phone) state.account.phone = customer.phone;
+  }
+  const orders = await apiGet("/api/customers/" + encodeURIComponent(CUSTOMER_KEY) + "/orders");
+  if(orders){
+    state.account.history = orders.map(o => ({
+      date: o.created_at, items: o.items_summary, total: o.total,
+      pointsEarned: o.points_earned, status: o.status, orderId: o.id
+    }));
+  }
+  if(customer || orders){
+    saveState();
+    if(state.view === "account") renderAccountView();
+  }
+}
 function currentOrderValue(){
   return cartTotal() + (state.basket.length ? state.basketPrice : 0);
 }
@@ -823,7 +908,9 @@ function nextRewardTier(){
   return REWARD_TIERS.find(t => t.points > state.account.points) || null;
 }
 
-function submitOrder(){
+let orderSubmitInFlight = false;
+async function submitOrder(){
+  if(orderSubmitInFlight) return;
   const total = currentOrderValue();
   if(total <= 0){
     toast("Nothing in your order yet");
@@ -837,14 +924,39 @@ function submitOrder(){
     ...(state.basket.length ? ["Farm Basket ($" + state.basketPrice + ")"] : [])
   ].filter(Boolean).join(", ");
 
-  const pointsEarned = Math.floor(total);
-  state.account.points += pointsEarned;
-  state.account.history.unshift({
-    date: new Date().toISOString(),
-    items: itemsSummary,
-    total: total,
-    pointsEarned: pointsEarned
+  orderSubmitInFlight = true;
+  const submitBtn = document.getElementById("submitOrderBtn");
+  submitBtn.disabled = true;
+
+  const serverResult = await apiSend("/api/orders", "POST", {
+    customerKey: CUSTOMER_KEY,
+    itemsSummary: itemsSummary,
+    total: total
   });
+
+  let pointsEarned;
+  if(serverResult && serverResult.order && serverResult.customer){
+    pointsEarned = serverResult.order.points_earned;
+    state.account.points = serverResult.customer.points;
+    state.account.history.unshift({
+      date: serverResult.order.created_at,
+      items: serverResult.order.items_summary,
+      total: serverResult.order.total,
+      pointsEarned: serverResult.order.points_earned,
+      status: serverResult.order.status,
+      orderId: serverResult.order.id
+    });
+  } else {
+    // Backend unreachable — same local-only behavior the app always had.
+    pointsEarned = Math.floor(total);
+    state.account.points += pointsEarned;
+    state.account.history.unshift({
+      date: new Date().toISOString(),
+      items: itemsSummary,
+      total: total,
+      pointsEarned: pointsEarned
+    });
+  }
   state.account.history = state.account.history.slice(0, 30);
 
   state.cart = [];
@@ -859,6 +971,9 @@ function submitOrder(){
   if(state.view === "cart") renderCartView();
   if(state.view === "basket") renderBasketView();
   if(state.view === "account") renderAccountView();
+
+  orderSubmitInFlight = false;
+  submitBtn.disabled = false;
 }
 document.getElementById("submitOrderBtn").addEventListener("click", submitOrder);
 
@@ -868,7 +983,9 @@ function renderAccountView(){
   const progressWrap = document.getElementById("rewardProgress");
   const next = nextRewardTier();
   progressWrap.innerHTML = "";
-  if(next){
+  if(REWARD_TIERS.length === 0){
+    progressWrap.appendChild(el("p", "reward-progress-label", "Reward rules haven't been set up yet — points are still being tracked."));
+  } else if(next){
     const prevThreshold = [...REWARD_TIERS].reverse().find(t => t.points <= state.account.points);
     const floor = prevThreshold ? prevThreshold.points : 0;
     const pct = Math.min(100, Math.round(((state.account.points - floor) / (next.points - floor)) * 100));
@@ -883,6 +1000,9 @@ function renderAccountView(){
 
   const list = document.getElementById("rewardsList");
   list.innerHTML = "";
+  if(REWARD_TIERS.length === 0){
+    list.appendChild(el("li", "reward-item locked", "No rewards configured yet — ask the farm what they'd like to offer."));
+  }
   REWARD_TIERS.forEach(t => {
     const unlocked = state.account.points >= t.points;
     const item = el("li", "reward-item " + (unlocked ? "unlocked" : "locked"));
@@ -904,7 +1024,8 @@ function renderAccountView(){
       const line = el("div", "order-history-line");
       const d = new Date(h.date);
       const left = el("div");
-      left.appendChild(el("div", "order-history-date", d.toLocaleDateString(undefined, { month:"short", day:"numeric", year:"numeric" }) + " · +" + h.pointsEarned + " pts"));
+      const statusText = h.status ? " · " + h.status : "";
+      left.appendChild(el("div", "order-history-date", d.toLocaleDateString(undefined, { month:"short", day:"numeric", year:"numeric" }) + " · +" + h.pointsEarned + " pts" + statusText));
       left.appendChild(el("div", "order-history-items", h.items));
       line.appendChild(left);
       line.appendChild(el("div", "order-history-total", money(h.total)));
@@ -913,12 +1034,37 @@ function renderAccountView(){
   }
 }
 
-document.getElementById("saveAccountInfoBtn").addEventListener("click", () => {
+document.getElementById("saveAccountInfoBtn").addEventListener("click", async () => {
   state.account.name = document.getElementById("accountName").value.trim();
   state.account.phone = document.getElementById("accountPhone").value.trim();
   saveState();
   toast("Your info is saved on this device");
+  await apiSend("/api/customers/" + encodeURIComponent(CUSTOMER_KEY), "POST", { name: state.account.name, phone: state.account.phone });
 });
+
+/* ---------------------------------------------------------------------
+   OPTIONAL GOOGLE SIGN-IN
+   Entirely optional — browsing and ordering work fully without it.
+   Signing in just lets points/history follow you across devices
+   instead of staying tied to this one browser. No secret is used here;
+   Google client IDs are public by design. The Worker verifies the
+   token server-side before trusting it.
+--------------------------------------------------------------------- */
+function handleGoogleCredential(response){
+  apiSend("/api/auth/google", "POST", { idToken: response.credential }).then((result) => {
+    if(!result || !result.key) return;
+    localStorage.setItem("afarm_customer_key", result.key);
+    toast("Signed in — your points will now follow this account");
+    refreshAccountFromServer();
+  });
+}
+function initGoogleSignIn(){
+  const clientId = document.getElementById("googleSignInDiv") ? document.getElementById("googleSignInDiv").dataset.clientId : "";
+  if(!clientId || clientId.indexOf("PASTE_") === 0) return; // not configured yet
+  if(!window.google || !window.google.accounts) return; // script not loaded
+  google.accounts.id.initialize({ client_id: clientId, callback: handleGoogleCredential });
+  google.accounts.id.renderButton(document.getElementById("googleSignInDiv"), { theme: "outline", size: "large" });
+}
 
 /* ---------------------------------------------------------------------
    NAVIGATION DRAWER
@@ -972,10 +1118,11 @@ function initHeroFallback(){
 --------------------------------------------------------------------- */
 function init(){
   initHeroFallback();
+  initGoogleSignIn();
   renderCartBadges();
   renderCartDrawer();
-  const startView = (location.hash || "#home").replace("#", "");
-  goToView(VIEW_IDS.includes(startView) ? startView : "home");
+  const route = currentRoute();
+  goToView(route.view, route.id);
 }
 
 document.addEventListener("DOMContentLoaded", init);

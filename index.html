@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FAF7F1">
 <title>A Farm — Fresh From the Field</title>
 <meta name="description" content="A Farm's digital menu. Browse fresh vegetables, fruits, herbs and flowers grown at our family farm.">
 <link rel="stylesheet" href="styles.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -46,7 +47,7 @@
     <li><a href="#home" data-nav="home">Home</a></li>
     <li><a href="#shop" data-nav="shop">Shop All</a></li>
     <li><a href="#flowers" data-nav="flowers">Flowers</a></li>
-    <li><a href="#basket" data-nav="basket">Farm Basket</a></li>
+    <li><a href="#basket" data-nav="basket">$30 Basket</a></li>
     <li><a href="#cart" data-nav="cart">Cart</a></li>
     <li><a href="#account" data-nav="account">My Account &amp; Points</a></li>
     <li><a href="#about" data-nav="about">About</a></li>
@@ -59,9 +60,8 @@
   <section class="view" id="view-home" data-view="home">
 
     <div class="hero">
-      <video class="hero-media" id="heroVideo" autoplay muted loop playsinline poster="">
-        <!-- Add a real farm video source here later, e.g. -->
-        <!-- <source src="media/farm-tour.mp4" type="video/mp4"> -->
+      <video class="hero-media" id="heroVideo" autoplay muted loop playsinline poster="media/images/harvest-table.jpg">
+        <source src="media/videos/hero-harvest-reel.mp4" type="video/mp4">
       </video>
       <div class="hero-fallback" id="heroFallback">
         <div class="hero-fallback-pattern" aria-hidden="true"></div>
@@ -73,7 +73,7 @@
         <p class="hero-sub">Fresh vegetables, fruits, herbs and flowers, grown by hand and picked to order.</p>
         <div class="hero-actions">
           <a href="#shop" class="btn btn-primary" data-nav="shop">Browse All Products</a>
-          <a href="#basket" class="btn btn-ghost" data-nav="basket">Build a Farm Basket</a>
+          <a href="#basket" class="btn btn-ghost" data-nav="basket">Build a $30 Basket</a>
         </div>
       </div>
     </div>
@@ -110,8 +110,8 @@
       <div class="basket-feature-card">
         <div class="basket-feature-text">
           <p class="eyebrow">A Farm Original</p>
-          <h2>The Farm Basket</h2>
-          <p>Pick your own price. Fill a basket with whatever fits &mdash; the more you pay, the more space you get.</p>
+          <h2>The $30 Farm Basket</h2>
+          <p>Fill a basket with whatever fits. One flat price, no matter what you choose.</p>
           <a href="#basket" class="btn btn-primary" data-nav="basket">Start My Basket</a>
         </div>
         <div class="basket-feature-visual" aria-hidden="true">
@@ -131,6 +131,7 @@
 
     <section class="about-teaser">
       <h2>About A Farm</h2>
+      <img class="about-teaser-img" src="media/images/harvest-table.jpg" alt="A basket of A Farm's tomatoes, beans, herbs, okra, cabbage and bottle gourd from a recent harvest" loading="lazy">
       <p>A Farm is a family-owned backyard farm in Virginia. Our half-acre backyard holds roughly a quarter acre of growing space, started about a year to a year and a half ago. We water with rainwater whenever we can, keep a hose on hand for the rest, and run our setup on a solar-chargeable power bank. Today we grow 70+ crop varieties.</p>
       <a href="#about" class="link-more" data-nav="about">Read more about our farm &rarr;</a>
     </section>
@@ -160,22 +161,13 @@
   <!-- ============ BASKET VIEW ============ -->
   <section class="view" id="view-basket" data-view="basket">
     <div class="view-header">
-      <h1>Farm Basket</h1>
-      <p class="view-sub">Pick a price, then fill it with whatever fits.</p>
+      <h1>$30 Farm Basket</h1>
+      <p class="view-sub">One flat price. Fill it with whatever fits.</p>
     </div>
 
     <div class="basket-panel">
-      <p class="basket-price-label">Choose your basket price</p>
-      <div class="basket-price-picker">
-        <button class="qty-btn qty-btn-lg" id="basketPriceMinus" aria-label="Decrease basket price">−</button>
-        <div class="basket-price-input-wrap">
-          <span class="basket-price-dollar">$</span>
-          <input type="number" id="basketPriceInput" class="basket-price-input" min="10" step="5" value="30" inputmode="numeric" aria-label="Basket price in dollars">
-        </div>
-        <button class="qty-btn qty-btn-lg" id="basketPricePlus" aria-label="Increase basket price">+</button>
-      </div>
-      <p class="basket-capacity-note" id="basketCapacityNote">$30 gets you 10 spaces of room.</p>
-      <p class="basket-explainer">Add eligible products below until your basket is full. The total stays whatever price you chose above &mdash; it's limited by space, not by the listed per-item prices.</p>
+      <div class="basket-price-badge">$30 <span>flat price</span></div>
+      <p class="basket-explainer">Add eligible products below until your basket is full. The total stays <strong>$30</strong> no matter what you pick &mdash; it's limited by space, not by the listed per-item prices.</p>
 
       <div class="basket-meter" role="progressbar" aria-label="Basket space used" aria-valuemin="0" id="basketMeterWrap">
         <div class="basket-meter-fill" id="basketMeterFill"></div>
@@ -233,6 +225,8 @@
         <span class="points-label">points</span>
       </div>
       <p class="points-explain">Earn 1 point for every $1 you spend when you submit an order.</p>
+      <p class="points-explain">Points already track on this device. Sign in with Google (optional) to keep them with you across devices instead:</p>
+      <div id="googleSignInDiv" data-client-id="PASTE_YOUR_GOOGLE_OAUTH_CLIENT_ID_HERE"></div>
 
       <div class="reward-progress" id="rewardProgress"></div>
 
@@ -254,6 +248,22 @@
       <h3>Order History</h3>
       <div id="orderHistoryList"></div>
       <p class="empty-note" id="orderHistoryEmpty">No orders submitted yet.</p>
+    </div>
+  </section>
+
+  <!-- ============ PRODUCT PAGE ============ -->
+  <section class="view" id="view-product" data-view="product">
+    <button class="back-link" id="productBackBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 18-6-6 6-6"/></svg>
+      Back
+    </button>
+    <div class="product-page-media" id="productPageMedia"></div>
+    <div class="detail-body">
+      <p class="detail-category" id="productPageCategory"></p>
+      <h1 id="productPageName"></h1>
+      <p class="detail-price" id="productPagePrice"></p>
+      <p class="detail-availability" id="productPageAvailability"></p>
+      <button class="btn btn-primary btn-block" id="productPageAddBtn">Add to Cart</button>
     </div>
   </section>
 
@@ -302,22 +312,6 @@
     <span>About</span>
   </a>
 </nav>
-
-<!-- ============ PRODUCT DETAIL MODAL ============ -->
-<div class="modal-scrim" id="detailScrim"></div>
-<div class="detail-sheet" id="detailSheet" role="dialog" aria-modal="true" aria-label="Product detail">
-  <button class="icon-btn detail-close" id="detailCloseBtn" aria-label="Back">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 18-6-6 6-6"/></svg>
-  </button>
-  <div class="detail-media" id="detailMedia"></div>
-  <div class="detail-body">
-    <p class="detail-category" id="detailCategory"></p>
-    <h2 id="detailName"></h2>
-    <p class="detail-price" id="detailPrice"></p>
-    <p class="detail-availability" id="detailAvailability"></p>
-    <button class="btn btn-primary btn-block" id="detailAddBtn">Add to Cart</button>
-  </div>
-</div>
 
 <!-- ============ CART DRAWER ============ -->
 <div class="modal-scrim" id="cartScrim"></div>
