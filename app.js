@@ -1060,8 +1060,9 @@ function handleGoogleCredential(response){
 }
 function initGoogleSignIn(){
   const clientId = document.getElementById("googleSignInDiv") ? document.getElementById("googleSignInDiv").dataset.clientId : "";
-  if(!clientId || clientId.indexOf("PASTE_") === 0) return; // not configured yet
+  if(!clientId || clientId.indexOf("PASTE_") === 0) return; // not configured yet — section stays hidden
   if(!window.google || !window.google.accounts) return; // script not loaded
+  document.getElementById("googleSignInSection").hidden = false;
   google.accounts.id.initialize({ client_id: clientId, callback: handleGoogleCredential });
   google.accounts.id.renderButton(document.getElementById("googleSignInDiv"), { theme: "outline", size: "large" });
 }
