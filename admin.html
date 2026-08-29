@@ -6,11 +6,9 @@
 <title>A Farm — Orders</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  /* Small admin-only additions — kept separate from the main site's styles.css on purpose. */
   body{ padding-top:20px; padding-bottom:40px; max-width:720px; margin:0 auto; }
   .admin-header{ padding:0 20px 12px; }
   .admin-header h1{ font-size:26px; }
-  .admin-refresh{ margin:0 20px 16px; }
   .order-card{
     margin:0 20px 14px; padding:16px; border:1px solid var(--line);
     border-radius:var(--radius-md); background:var(--card); box-shadow:var(--shadow-sm);
@@ -27,93 +25,70 @@
   }
   .status-chip.current{ background:var(--ink); color:#fff; border-color:var(--ink); }
   .empty-note{ padding:0 20px; }
-  #connError{ margin:0 20px 16px; color:var(--brick-dark); font-weight:600; font-size:14px; display:none; }
 </style>
 </head>
 <body>
   <div class="admin-header">
     <h1>A Farm — Orders</h1>
-    <p class="view-sub">Tap a status to move an order forward. This page talks directly to the SQLite backend — refresh any time to see new orders.</p>
+    <p class="view-sub">Tap a status to move an order forward. This reads the order history saved in this browser's storage — open it on the same device/browser customers are ordering from.</p>
   </div>
-  <button class="btn btn-ghost admin-refresh" id="refreshBtn">Refresh</button>
-  <p id="connError">Can't reach the server. Check the Worker URL in this page's script and that it's deployed.</p>
   <div id="ordersList"></div>
   <p class="empty-note" id="emptyNote" hidden>No orders yet.</p>
 
 <script>
 const STATUS_PIPELINE = ["Order Received", "Preparing", "Ready", "Completed"];
 
-/* Paste your deployed Worker URL here (same as app.js's API_BASE). */
-const API_BASE = "PASTE_YOUR_WORKER_URL_HERE";
-function apiUrl(path){
-  return (API_BASE && !API_BASE.startsWith("PASTE_")) ? API_BASE + path : path;
-}
-
-function getAdminToken(){
-  let token = localStorage.getItem("afarm_admin_token");
-  if(!token){
-    token = prompt("Enter the farm admin token:") || "";
-    if(token) localStorage.setItem("afarm_admin_token", token);
-  }
-  return token;
-}
-
 function money(n){ return "$" + Number(n).toFixed(2); }
 
-async function loadOrders(){
-  const list = document.getElementById("ordersList");
-  const emptyNote = document.getElementById("emptyNote");
-  const connError = document.getElementById("connError");
+function loadAccount(){
   try{
-    const res = await fetch(apiUrl("/api/orders"), {
-      headers: { "Authorization": "Bearer " + getAdminToken() }
-    });
-    if(res.status === 401){
-      localStorage.removeItem("afarm_admin_token");
-      connError.textContent = "Wrong admin token — refresh to try again.";
-      connError.style.display = "block";
-      return;
-    }
-    if(!res.ok) throw new Error("bad response");
-    const orders = await res.json();
-    connError.style.display = "none";
-    list.innerHTML = "";
-    emptyNote.hidden = orders.length > 0;
-    orders.forEach(o => list.appendChild(buildOrderCard(o)));
+    return JSON.parse(localStorage.getItem("afarm_account")) || { history: [] };
   }catch(e){
-    connError.textContent = "Can't reach the server. Check the Worker URL and that it's deployed.";
-    connError.style.display = "block";
+    return { history: [] };
   }
 }
+function saveAccount(account){
+  localStorage.setItem("afarm_account", JSON.stringify(account));
+}
 
-function buildOrderCard(o){
+function renderOrders(){
+  const account = loadAccount();
+  const list = document.getElementById("ordersList");
+  const emptyNote = document.getElementById("emptyNote");
+  list.innerHTML = "";
+  const history = account.history || [];
+  emptyNote.hidden = history.length > 0;
+  history.forEach((o, index) => list.appendChild(buildOrderCard(o, index)));
+}
+
+function buildOrderCard(o, index){
   const card = document.createElement("div");
   card.className = "order-card";
 
   const top = document.createElement("div");
   top.className = "order-card-top";
-  top.innerHTML = '<span class="order-id">Order #' + o.id + '</span><span class="order-total">' + money(o.total) + '</span>';
+  top.innerHTML = '<span class="order-id">Order #' + (o.orderId || index + 1) + '</span><span class="order-total">' + money(o.total) + '</span>';
   card.appendChild(top);
 
   const meta = document.createElement("div");
   meta.className = "order-meta";
-  const who = o.customer_name ? o.customer_name + (o.customer_phone ? " · " + o.customer_phone : "") : "Anonymous customer";
-  const when = new Date(o.created_at).toLocaleString();
-  meta.textContent = who + " · " + when + " · +" + o.points_earned + " pts";
+  const when = new Date(o.date).toLocaleString();
+  meta.textContent = when + " · +" + o.pointsEarned + " pts";
   card.appendChild(meta);
 
   const items = document.createElement("div");
   items.className = "order-items";
-  items.textContent = o.items_summary;
+  items.textContent = o.items;
   card.appendChild(items);
 
   const statusRow = document.createElement("div");
   statusRow.className = "status-row";
+  const currentStatus = o.status || "Order Received";
   STATUS_PIPELINE.forEach(s => {
     const chip = document.createElement("button");
-    chip.className = "status-chip" + (o.status === s ? " current" : "");
+    chip.className = "status-chip" + (currentStatus === s ? " current" : "");
     chip.textContent = s;
-    chip.addEventListener("click", () => updateStatus(o.id, s));
+    chip.addEventListener("click", () => updateStatus(index, s));
     statusRow.appendChild(chip);
   });
   card.appendChild(statusRow);
@@ -121,22 +96,15 @@ function buildOrderCard(o){
   return card;
 }
 
-async function updateStatus(id, status){
-  try{
-    const res = await fetch(apiUrl("/api/orders/" + id), {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + getAdminToken() },
-      body: JSON.stringify({ status })
-    });
-    if(!res.ok) throw new Error("failed");
-    loadOrders();
-  }catch(e){
-    alert("Could not update order status — check the server connection and admin token.");
-  }
+function updateStatus(index, status){
+  const account = loadAccount();
+  if(!account.history || !account.history[index]) return;
+  account.history[index].status = status;
+  saveAccount(account);
+  renderOrders();
 }
 
-document.getElementById("refreshBtn").addEventListener("click", loadOrders);
-loadOrders();
+renderOrders();
 </script>
 </body>
 </html>
