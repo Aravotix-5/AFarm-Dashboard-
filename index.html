@@ -340,6 +340,23 @@
   </div>
   <p class="order-sub">Show this screen to the farmer to check out. Payment is handled in person at the farm.</p>
   <div id="orderSummaryBody"></div>
+
+  <div class="checkout-extras">
+    <div class="coupon-row">
+      <input type="text" id="couponCodeInput" class="field-input" placeholder="Coupon code (optional)" autocapitalize="characters">
+      <button class="btn btn-ghost btn-sm" id="applyCouponBtn">Apply</button>
+    </div>
+    <p class="checkout-note" id="couponMessage"></p>
+
+    <div id="pointsRedeemSection" hidden>
+      <button class="btn btn-ghost btn-block" id="applyPointsBtn"></button>
+      <p class="checkout-note" id="pointsMessage"></p>
+    </div>
+
+    <p class="order-discount-line" id="orderDiscountLine" hidden></p>
+    <p class="order-final-total" id="orderFinalTotal"></p>
+  </div>
+
   <p class="order-points-note" id="orderPointsNote"></p>
   <button class="btn btn-primary btn-block" id="submitOrderBtn">Submit Order &amp; Earn Points</button>
   <button class="btn btn-ghost btn-block" id="orderDoneBtn">Just Close (No Points Yet)</button>
@@ -347,6 +364,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="products-data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,152 +1,35 @@
 /* ==========================================================================
    A FARM — APP LOGIC
-   Plain JS, no dependencies. All data lives in PRODUCTS / CATEGORIES below
-   so the catalog can be edited easily. No backend, no payments.
+   Plain JS, no dependencies. The product catalog (PRODUCTS/CATEGORIES)
+   lives in products-data.js, loaded before this file. No backend, no
+   payments — everything here is localStorage.
    ========================================================================== */
-
-/* ---------------------------------------------------------------------
-   CATEGORY METADATA
---------------------------------------------------------------------- */
-const CATEGORIES = [
-  { key: "vegetables", label: "Vegetables",        emoji: "🥦" },
-  { key: "tomatoes",   label: "Tomatoes",           emoji: "🍅" },
-  { key: "peppers",    label: "Peppers & Chilies",  emoji: "🌶️" },
-  { key: "root",       label: "Root Vegetables",    emoji: "🥕" },
-  { key: "squash",     label: "Squash & Zucchini",  emoji: "🥒" },
-  { key: "beans",      label: "Beans",               emoji: "🫘" },
-  { key: "okra",       label: "Okra",                emoji: "🌾" },
-  { key: "potatoes",   label: "Potatoes",            emoji: "🥔" },
-  { key: "herbs",      label: "Herbs & Leaves",      emoji: "🌿" },
-  { key: "fruits",     label: "Fruits",              emoji: "🍑" },
-  { key: "flowers",    label: "Flowers",             emoji: "🌸" },
-  { key: "seeds",      label: "Seeds",               emoji: "🌰" },
-  { key: "baskets",    label: "Baskets",             emoji: "🧺" }
-];
-function categoryLabel(key){
-  const c = CATEGORIES.find(c => c.key === key);
-  return c ? c.label : key;
-}
-
-/* ---------------------------------------------------------------------
-   PRODUCT CATALOG
-   image / video left empty until real farm media is supplied.
-   price: number, or null when not yet provided (see priceNote).
-   available: true/false only when confirmed; otherwise availabilityNote.
-   basketEligible + basketSpace configure the $30 Basket feature.
---------------------------------------------------------------------- */
-const PRODUCTS = [
-  // ---- TOMATOES ----
-  { id:"tom-cherry",  name:"Cherry Tomatoes",         category:"tomatoes", price:5.99, unit:"quart",     available:true, featured:true,  basketEligible:true, basketSpace:2, image:"media/images/cherry-tomatoes-vine.jpg", video:"media/videos/cherry-tomato-harvest.mp4" },
-  { id:"tom-bigboy",  name:"Big Boy Tomatoes",        category:"tomatoes", price:4.99, unit:"quart",     available:true, basketEligible:true, basketSpace:2, image:"media/images/tomato-ripening.jpg", video:"media/videos/tomato-ripening.mp4" },
-  { id:"tom-long",    name:"Long Tomatoes",           category:"tomatoes", price:5.49, unit:"quart",     available:true, basketEligible:true, basketSpace:2 },
-  { id:"tom-jelly",   name:"Jelly Bean Hybrid Tomatoes", category:"tomatoes", price:6.49, unit:"quart",  available:true, basketEligible:true, basketSpace:2 },
-
-  // ---- PEPPERS & CHILIES ----
-  { id:"pep-thai",     name:"Thai Chili",         category:"peppers", price:7.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"pep-jalapeno", name:"Jalapeño",           category:"peppers", price:4.99, unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:1 },
-  { id:"pep-indian",   name:"Indian Chili",       category:"peppers", price:7.49, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"pep-bell",     name:"Sweet Bell Pepper",  category:"peppers", price:4.99, unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:1 },
-  { id:"pep-habanero", name:"Habanero",           category:"peppers", price:8.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"pep-green",    name:"Green Chili",        category:"peppers", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-
-  // ---- VEGETABLES / GREENS ----
-  { id:"veg-broccoli",   name:"Broccoli",              category:"vegetables", price:4.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:2 },
-  { id:"veg-spinach",    name:"Spinach",               category:"vegetables", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"veg-cauliflower",name:"Cauliflower",           category:"vegetables", price:5.99, unit:"each", available:true, basketEligible:true, basketSpace:2, stockNote:"2 available" },
-  { id:"veg-cucumber",   name:"Cucumber",              category:"vegetables", price:3.99, unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:2 },
-  { id:"veg-lettuce",    name:"Lettuce Varieties",     category:"vegetables", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"veg-cabbage",    name:"Cabbage",               category:"vegetables", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false, image:"media/images/cabbage-head.jpg", video:"media/videos/cabbage-harvest.mp4" },
-
-  // ---- ONIONS & GARLIC (organized under Vegetables) ----
-  { id:"veg-garlic-mex",   name:"Mexican Garlic",     category:"vegetables", price:8.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"veg-garlic-am",    name:"American Garlic",    category:"vegetables", price:7.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"veg-onion-red",    name:"Red Onion",          category:"vegetables", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"veg-onion-white",  name:"White Onion",        category:"vegetables", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"veg-onion-texas",  name:"Texas Yellow Onion", category:"vegetables", price:4.49, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-
-  // ---- EGGPLANT (organized under Vegetables) ----
-  { id:"veg-eggplant", name:"Eggplant",          category:"vegetables", price:4.99, unit:"each", available:true, basketEligible:true, basketSpace:2, image:"media/images/eggplant-plant.jpg", video:"media/videos/eggplant-harvest.mp4" },
-
-  // ---- SQUASH & ZUCCHINI ----
-  { id:"sq-yellow",   name:"Yellow Squash",        category:"squash", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-  { id:"sq-summer",   name:"Summer Squash",        category:"squash", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-  { id:"sq-bottle",   name:"Bottle Gourd",         category:"squash", price:5.99, unit:"each", available:true, basketEligible:true, basketSpace:4, image:"media/images/bottle-gourd-single.jpg", video:"media/videos/bottle-gourd-harvest.mp4" },
-  { id:"zuc-american",name:"American Zucchini",    category:"squash", price:3.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:2 },
-  { id:"zuc-indian",  name:"Indian Zucchini",       category:"squash", price:4.49, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-  { id:"zuc-darkgreen",name:"Dark Green Zucchini",  category:"squash", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-  { id:"zuc-black",   name:"Black Zucchini",        category:"squash", price:4.49, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-
-  // ---- GOURDS ----
-  // (Cese Loofah Gourd and Early Asian Loofah removed — not actually grown/sold.
-  //  Bottle Gourd lives under Squash & Zucchini below.)
-
-  // ---- ROOT VEGETABLES ----
-  { id:"root-carrot", name:"Carrot",     category:"root", price:3.99, unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:2 },
-  { id:"root-radred", name:"Red Radish", category:"root", price:4.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"root-radwhite",name:"White Radish", category:"root", price:4.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"root-beets",  name:"Beets",      category:"root", price:4.99, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-
-  // ---- HERBS & LEAVES ----
-  { id:"herb-basil",    name:"Basil",           category:"herbs", price:9.99,  unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-cilantro", name:"Cilantro",        category:"herbs", price:7.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-coriander",name:"Coriander",       category:"herbs", price:7.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-dill",     name:"Dill",            category:"herbs", price:8.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-mint",     name:"Mint",            category:"herbs", price:8.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-lavender", name:"Lavender",        category:"herbs", price:12.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-thyme",    name:"Thyme",           category:"herbs", price:9.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-lemongrass",name:"Lemongrass",     category:"herbs", price:8.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-curry",    name:"Curry Leaves",    category:"herbs", price:12.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-moringa",  name:"Moringa Leaves",  category:"herbs", price:9.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-parsley",  name:"Italian Parsley", category:"herbs", price:8.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"herb-aloe",     name:"Aloe Leaves",     category:"herbs", price:4.99,  unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-
-  // ---- FRUITS ----
-  { id:"fr-strawberry", name:"Strawberries",         category:"fruits", price:6.99,  unit:"quart",   available:true, featured:true, basketEligible:true, basketSpace:2 },
-  { id:"fr-raspberry",  name:"Raspberries",          category:"fruits", price:9.99,  unit:"quart",   available:true, basketEligible:true, basketSpace:2 },
-  { id:"fr-pear",       name:"Pear",                 category:"fruits", price:4.99,  unit:"quart",   available:true, basketEligible:true, basketSpace:2 },
-  { id:"fr-peach",      name:"Peach",                category:"fruits", price:5.99,  unit:"quart",   available:true, seasonal:true, basketEligible:true, basketSpace:2 },
-  { id:"fr-cantaloupe", name:"Cantaloupe",           category:"fruits", price:4.99,  unit:"quart",   available:true, seasonal:true, basketEligible:true, basketSpace:3 },
-  { id:"fr-watermelon", name:"Watermelon",           category:"fruits", price:7.99,  unit:"each", available:true, featured:true, basketEligible:true, basketSpace:4 },
-  { id:"fr-blackdiamond",name:"Black Diamond Watermelon", category:"fruits", price:12.99, unit:"each", available:true, basketEligible:true, basketSpace:4 },
-  { id:"fr-pumpkin",    name:"Pumpkin",              category:"fruits", price:8.99,  unit:"each", available:true, basketEligible:true, basketSpace:4 },
-  { id:"fr-lemon",      name:"Lemons",               category:"fruits", price:3.99,  unit:"quart",   available:true, basketEligible:true, basketSpace:1 },
-
-  // ---- OKRA ----
-  { id:"okra-crimson", name:"Crimson Okra", category:"okra", price:5.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:2 },
-  { id:"okra-emerald", name:"Emerald Okra", category:"okra", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"media/images/okra-pods.jpg", video:"media/videos/okra-harvest.mp4" },
-
-  // ---- POTATOES ----
-  { id:"pot-red",   name:"Red Potatoes",   category:"potatoes", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-  { id:"pot-white", name:"White Potatoes", category:"potatoes", price:3.99, unit:"quart", available:true, basketEligible:true, basketSpace:2 },
-
-  // ---- BEANS ----
-  { id:"bean-green", name:"Green Beans",         category:"beans", price:4.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:1, image:"media/images/green-beans-harvest.jpg", video:"media/videos/green-beans-harvest.mp4" },
-  { id:"bean-lima",  name:"Lima Beans",          category:"beans", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-  { id:"bean-guar",  name:"Guar Cluster Beans",  category:"beans", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:1 },
-
-  // ---- SEEDS (not basket-eligible) ----
-  { id:"seed-moringa-std", name:"Standard Moringa Seeds",        category:"seeds", price:6.99, unit:"packet", available:true, basketEligible:false },
-  { id:"seed-moringa-black",name:"Matured Black Moringa Seeds",  category:"seeds", price:8.99, unit:"packet", available:true, basketEligible:false },
-
-  // ---- FLOWERS (no invented prices; not confirmed as currently grown) ----
-  { id:"fl-roses",     name:"Roses",                 category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-sunflowers",name:"Sunflowers",             category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-marigolds", name:"Marigolds",              category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-zinnias",   name:"Zinnias",                category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-cosmos",    name:"Cosmos",                 category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-dahlias",   name:"Dahlias",                category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-lavenderfl",name:"Lavender Flowers",       category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-wildflowers",name:"Wildflowers",           category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-bouquets",  name:"Mixed Flower Bouquets",  category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-seasonal",  name:"Seasonal Flowers",       category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-  { id:"fl-bundles",   name:"Flower Bundles",         category:"flowers", price:null, priceNote:"Price available at farm", availabilityNote:"INFORMATION NEEDED", basketEligible:false },
-
-  // ---- BASKETS ----
-  { id:"basket-30", name:"$30 Farm Basket", category:"baskets", price:30, unit:"basket", available:true, basketEligible:false, isBasketProduct:true }
-];
 
 const PRODUCT_MAP = {};
 PRODUCTS.forEach(p => PRODUCT_MAP[p.id] = p);
+
+/* ---------------------------------------------------------------------
+   ADMIN OVERRIDES (price / in-stock changes made from admin.html)
+   Stored separately from the catalog itself, layered on top at read
+   time. This is how the admin panel changes a price or marks something
+   out of stock without editing code — everything stays localStorage.
+--------------------------------------------------------------------- */
+function getOverrides(){
+  try{
+    return JSON.parse(localStorage.getItem("afarm_admin_overrides")) || {};
+  }catch(e){ return {}; }
+}
+function getProduct(id){
+  const base = PRODUCT_MAP[id];
+  if(!base) return null;
+  const ov = getOverrides()[id];
+  return ov ? { ...base, ...ov } : base;
+}
+/* Full catalog with admin overrides applied — use this (not the raw
+   PRODUCTS array) anywhere prices/stock need to reflect admin changes. */
+function liveProducts(){
+  return PRODUCTS.map(p => getProduct(p.id));
+}
 
 /* The $30 Farm Basket is a fixed flat price — not customer-adjustable.
    Capacity is a fixed 10 spaces (see BASKET_CAPACITY below). */
@@ -358,9 +241,9 @@ window.addEventListener("hashchange", () => {
    HOME VIEW
 --------------------------------------------------------------------- */
 function renderHome(){
-  const featured = PRODUCTS.filter(p => p.featured);
-  const flowers = PRODUCTS.filter(p => p.category === "flowers").slice(0, 6);
-  const seasonal = PRODUCTS.filter(p => p.seasonal);
+  const featured = liveProducts().filter(p => p.featured);
+  const flowers = liveProducts().filter(p => p.category === "flowers").slice(0, 6);
+  const seasonal = liveProducts().filter(p => p.seasonal);
 
   fillRail("featuredProductsRail", featured);
   fillRail("featuredFlowersRail", flowers);
@@ -441,7 +324,7 @@ function renderShop(){
   const container = document.getElementById("shopCategories");
   container.innerHTML = "";
 
-  const visible = PRODUCTS.filter(matchesShopFilterOrSearch);
+  const visible = liveProducts().filter(matchesShopFilterOrSearch);
 
   const info = document.getElementById("resultsInfo");
   if(state.searchTerm){
@@ -475,7 +358,7 @@ function renderShop(){
 function renderFlowers(){
   const grid = document.getElementById("flowersGrid");
   grid.innerHTML = "";
-  PRODUCTS.filter(p => p.category === "flowers" && matchesSearch(p)).forEach(p => grid.appendChild(buildProductCard(p)));
+  liveProducts().filter(p => p.category === "flowers" && matchesSearch(p)).forEach(p => grid.appendChild(buildProductCard(p)));
 }
 
 /* ---------------------------------------------------------------------
@@ -500,7 +383,7 @@ function openProductPage(id){
 }
 
 function renderProductPage(id){
-  const p = PRODUCT_MAP[id];
+  const p = getProduct(id);
   if(!p){ location.hash = "#shop"; return; }
 
   addRecentlyViewed(id);
@@ -546,7 +429,7 @@ function addRecentlyViewed(id){
 const MAX_CART_QTY = 20;
 
 function addToCart(id, qty){
-  const p = PRODUCT_MAP[id];
+  const p = getProduct(id);
   if(!p || p.price == null || !isAvailable(p)) return;
   qty = Math.max(1, Math.floor(Number(qty)) || 1);
   const existing = state.cart.find(l => l.id === id);
@@ -590,7 +473,7 @@ function clearCart(){
 }
 function cartTotal(){
   return state.cart.reduce((sum, l) => {
-    const p = PRODUCT_MAP[l.id];
+    const p = getProduct(l.id);
     return p ? sum + p.price * l.qty : sum;
   }, 0);
 }
@@ -608,7 +491,7 @@ function renderCartBadges(){
 }
 
 function buildCartLine(l, context){
-  const p = PRODUCT_MAP[l.id];
+  const p = getProduct(l.id);
   if(!p) return document.createDocumentFragment();
   const line = el("div", "cart-line");
 
@@ -688,6 +571,7 @@ document.getElementById("viewFullCartBtn").addEventListener("click", closeCartDr
    ORDER SUMMARY ("Show My Order")
 --------------------------------------------------------------------- */
 function openOrderSummary(){
+  resetCheckout();
   const body = document.getElementById("orderSummaryBody");
   body.innerHTML = "";
 
@@ -695,7 +579,7 @@ function openOrderSummary(){
     body.appendChild(el("p", "empty-note", "Nothing in your order yet."));
   } else {
     state.cart.forEach(l => {
-      const p = PRODUCT_MAP[l.id];
+      const p = getProduct(l.id);
       if(!p) return;
       const row = el("div", "order-line");
       row.innerHTML = '<span class="order-line-name">' + l.qty + '× ' + p.name + '</span><span>' + money(p.price * l.qty) + '</span>';
@@ -708,21 +592,98 @@ function openOrderSummary(){
     }
     if(state.basket.length){
       const bRow = el("div", "order-line");
-      const items = state.basket.map(b => PRODUCT_MAP[b.id] ? PRODUCT_MAP[b.id].name + (b.qty>1?" ×"+b.qty:"") : "").filter(Boolean).join(", ");
+      const items = state.basket.map(b => getProduct(b.id) ? getProduct(b.id).name + (b.qty>1?" ×"+b.qty:"") : "").filter(Boolean).join(", ");
       bRow.innerHTML = '<span class="order-line-name">Farm Basket</span><span>' + money(state.basketPrice) + '</span>';
       body.appendChild(bRow);
       body.appendChild(el("p", "cart-note", "Basket contents: " + items));
     }
   }
 
-  const total = currentOrderValue();
-  const pointsNote = document.getElementById("orderPointsNote");
-  pointsNote.textContent = total > 0 ? "Submitting this order earns " + Math.floor(total) + " loyalty points." : "";
-  document.getElementById("submitOrderBtn").disabled = total <= 0;
+  document.getElementById("couponCodeInput").value = "";
+  document.getElementById("couponMessage").textContent = "";
+  document.getElementById("couponMessage").className = "checkout-note";
+
+  const rate = getRedemptionRate();
+  const pointsSection = document.getElementById("pointsRedeemSection");
+  if(rate && state.account.points > 0 && currentOrderValue() > 0){
+    pointsSection.hidden = false;
+    const maxDollarsFromPoints = Math.floor(state.account.points / rate.pointsPerDollar);
+    document.getElementById("applyPointsBtn").textContent =
+      "Use my points for up to " + money(maxDollarsFromPoints) + " off (" + state.account.points + " pts)";
+    document.getElementById("applyPointsBtn").disabled = maxDollarsFromPoints <= 0;
+  } else {
+    pointsSection.hidden = true;
+  }
+  document.getElementById("pointsMessage").textContent = "";
+
+  refreshCheckoutTotals();
 
   document.getElementById("orderScrim").classList.add("open");
   document.getElementById("orderSheet").classList.add("open");
 }
+
+function refreshCheckoutTotals(){
+  const subtotal = currentOrderValue();
+  const discount = checkoutDiscount();
+  const final = checkoutFinalTotal();
+
+  const discountLine = document.getElementById("orderDiscountLine");
+  if(discount > 0){
+    discountLine.hidden = false;
+    discountLine.innerHTML = '<span>Discount</span><span>-' + money(discount) + '</span>';
+  } else {
+    discountLine.hidden = true;
+  }
+
+  document.getElementById("orderFinalTotal").innerHTML =
+    '<span>Total due at the farm</span><span>' + money(final) + '</span>';
+
+  const pointsNote = document.getElementById("orderPointsNote");
+  pointsNote.textContent = subtotal > 0 ? "Submitting this order earns " + Math.floor(final) + " loyalty points." : "";
+  document.getElementById("submitOrderBtn").disabled = subtotal <= 0;
+}
+
+document.getElementById("applyCouponBtn").addEventListener("click", () => {
+  const code = document.getElementById("couponCodeInput").value;
+  const msg = document.getElementById("couponMessage");
+  const coupon = findActiveCoupon(code);
+  if(!coupon){
+    checkout.couponCode = null;
+    checkout.couponDiscount = 0;
+    msg.textContent = code.trim() ? "That coupon code isn't valid." : "Enter a coupon code first.";
+    msg.className = "checkout-note bad";
+    refreshCheckoutTotals();
+    return;
+  }
+  const subtotal = currentOrderValue();
+  const rawDiscount = coupon.type === "percent" ? subtotal * (coupon.value / 100) : coupon.value;
+  const remainingAfterPoints = Math.max(0, subtotal - checkout.pointsDiscount);
+  checkout.couponCode = coupon.code;
+  checkout.couponDiscount = Math.min(rawDiscount, remainingAfterPoints);
+  msg.textContent = "Coupon " + coupon.code + " applied: -" + money(checkout.couponDiscount);
+  msg.className = "checkout-note good";
+  refreshCheckoutTotals();
+});
+
+document.getElementById("applyPointsBtn").addEventListener("click", () => {
+  const rate = getRedemptionRate();
+  if(!rate) return;
+  const msg = document.getElementById("pointsMessage");
+  const subtotal = currentOrderValue();
+  const remainingAfterCoupon = Math.max(0, subtotal - checkout.couponDiscount);
+  const maxDollarsFromPoints = Math.floor(state.account.points / rate.pointsPerDollar);
+  const dollarsToUse = Math.min(maxDollarsFromPoints, remainingAfterCoupon);
+  const pointsToUse = dollarsToUse * rate.pointsPerDollar;
+  checkout.pointsRedeemed = pointsToUse;
+  checkout.pointsDiscount = dollarsToUse;
+  msg.textContent = pointsToUse > 0
+    ? "Using " + pointsToUse + " points for " + money(dollarsToUse) + " off."
+    : "Not enough points for a discount yet.";
+  msg.className = "checkout-note good";
+  document.getElementById("applyPointsBtn").disabled = true;
+  refreshCheckoutTotals();
+});
+
 function closeOrderSummary(){
   document.getElementById("orderScrim").classList.remove("open");
   document.getElementById("orderSheet").classList.remove("open");
@@ -743,13 +704,13 @@ const BASKET_FILTER_GROUPS = [
 
 function basketSpaceUsed(){
   return state.basket.reduce((sum, b) => {
-    const p = PRODUCT_MAP[b.id];
+    const p = getProduct(b.id);
     return p ? sum + p.basketSpace * b.qty : sum;
   }, 0);
 }
 
 function addToBasket(id){
-  const p = PRODUCT_MAP[id];
+  const p = getProduct(id);
   if(!p || !p.basketEligible) return;
   const used = basketSpaceUsed();
   if(used + p.basketSpace > basketCapacity()){
@@ -809,7 +770,7 @@ function renderBasketView(){
   } else {
     reviewBtn.hidden = false;
     state.basket.forEach(b => {
-      const p = PRODUCT_MAP[b.id];
+      const p = getProduct(b.id);
       if(!p) return;
       const line = el("div", "basket-line");
       const left = el("div");
@@ -825,7 +786,7 @@ function renderBasketView(){
 
   const grid = document.getElementById("basketEligibleGrid");
   grid.innerHTML = "";
-  const eligible = PRODUCTS.filter(p => p.basketEligible && isAvailable(p) &&
+  const eligible = liveProducts().filter(p => p.basketEligible && isAvailable(p) &&
     (state.basketFilter === "all" || p.category === state.basketFilter));
 
   eligible.forEach(p => {
@@ -858,7 +819,43 @@ document.getElementById("reviewBasketBtn").addEventListener("click", openOrderSu
    tracked per order and can be updated from admin.html, which reads
    and writes the same localStorage on the same device/browser.
 --------------------------------------------------------------------- */
-const ORDER_STATUS_PIPELINE = ["Order Received", "Preparing", "Ready", "Completed"];
+const ORDER_STATUS_PIPELINE = ["Order Received", "Preparing", "Ready", "Completed", "Returned"];
+
+/* ---------------------------------------------------------------------
+   COUPONS + POINTS REDEMPTION
+   Coupons and the points-redemption rate are both set from admin.html
+   (localStorage-based) — nothing here invents a discount or a rate.
+   If the farm hasn't configured a redemption rate yet, that section
+   stays hidden on checkout.
+--------------------------------------------------------------------- */
+function getCoupons(){
+  try{ return JSON.parse(localStorage.getItem("afarm_coupons")) || []; }
+  catch(e){ return []; }
+}
+function findActiveCoupon(code){
+  code = (code || "").trim().toUpperCase();
+  if(!code) return null;
+  return getCoupons().find(c => c.code.toUpperCase() === code && c.active) || null;
+}
+function getRedemptionRate(){
+  try{
+    const rate = JSON.parse(localStorage.getItem("afarm_redemption_rate"));
+    return (rate && rate.pointsPerDollar > 0) ? rate : null;
+  }catch(e){ return null; }
+}
+
+let checkout = { couponCode: null, couponDiscount: 0, pointsRedeemed: 0, pointsDiscount: 0 };
+
+function resetCheckout(){
+  checkout = { couponCode: null, couponDiscount: 0, pointsRedeemed: 0, pointsDiscount: 0 };
+}
+
+function checkoutDiscount(){
+  return checkout.couponDiscount + checkout.pointsDiscount;
+}
+function checkoutFinalTotal(){
+  return Math.max(0, currentOrderValue() - checkoutDiscount());
+}
 
 function currentOrderValue(){
   return cartTotal() + (state.basket.length ? state.basketPrice : 0);
@@ -871,14 +868,15 @@ function nextRewardTier(){
 let orderSubmitInFlight = false;
 function submitOrder(){
   if(orderSubmitInFlight) return;
-  const total = currentOrderValue();
-  if(total <= 0){
+  const subtotal = currentOrderValue();
+  if(subtotal <= 0){
     toast("Nothing in your order yet");
     return;
   }
+  const finalTotal = checkoutFinalTotal();
   const itemsSummary = [
     ...state.cart.map(l => {
-      const p = PRODUCT_MAP[l.id];
+      const p = getProduct(l.id);
       return p ? l.qty + "× " + p.name : "";
     }),
     ...(state.basket.length ? ["Farm Basket ($" + state.basketPrice + ")"] : [])
@@ -888,13 +886,18 @@ function submitOrder(){
   const submitBtn = document.getElementById("submitOrderBtn");
   submitBtn.disabled = true;
 
-  const pointsEarned = Math.floor(total);
-  state.account.points += pointsEarned;
+  const pointsEarned = Math.floor(finalTotal);
+  state.account.points = Math.max(0, state.account.points - checkout.pointsRedeemed) + pointsEarned;
   state.account.history.unshift({
     orderId: Date.now(),
     date: new Date().toISOString(),
     items: itemsSummary,
-    total: total,
+    total: finalTotal,
+    subtotal: subtotal,
+    couponCode: checkout.couponCode,
+    couponDiscount: checkout.couponDiscount,
+    pointsRedeemed: checkout.pointsRedeemed,
+    pointsDiscount: checkout.pointsDiscount,
     pointsEarned: pointsEarned,
     status: "Order Received"
   });
@@ -902,6 +905,7 @@ function submitOrder(){
 
   state.cart = [];
   state.basket = [];
+  resetCheckout();
   saveState();
 
   renderCartBadges();
@@ -961,18 +965,37 @@ function renderAccountView(){
     historyEmpty.hidden = false;
   } else {
     historyEmpty.hidden = true;
-    state.account.history.forEach(h => {
+    state.account.history.forEach((h, index) => {
       const line = el("div", "order-history-line");
       const d = new Date(h.date);
       const left = el("div");
       const statusText = h.status ? " · " + h.status : "";
       left.appendChild(el("div", "order-history-date", d.toLocaleDateString(undefined, { month:"short", day:"numeric", year:"numeric" }) + " · +" + h.pointsEarned + " pts" + statusText));
       left.appendChild(el("div", "order-history-items", h.items));
+      if(h.couponCode || h.pointsRedeemed){
+        const bits = [];
+        if(h.couponCode) bits.push("Coupon " + h.couponCode + " (-" + money(h.couponDiscount) + ")");
+        if(h.pointsRedeemed) bits.push(h.pointsRedeemed + " pts redeemed (-" + money(h.pointsDiscount) + ")");
+        left.appendChild(el("div", "order-history-discount", bits.join(" · ")));
+      }
+      if(h.status === "Completed"){
+        const returnBtn = el("button", "order-history-return", "Request Return");
+        returnBtn.addEventListener("click", () => requestReturn(index));
+        left.appendChild(returnBtn);
+      }
       line.appendChild(left);
       line.appendChild(el("div", "order-history-total", money(h.total)));
       historyList.appendChild(line);
     });
   }
+}
+
+function requestReturn(index){
+  if(!state.account.history[index]) return;
+  state.account.history[index].status = "Returned";
+  saveState();
+  renderAccountView();
+  toast("Return requested — let the farmer know at pickup/drop-off");
 }
 
 document.getElementById("saveAccountInfoBtn").addEventListener("click", () => {

@@ -3,61 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>A Farm — Orders</title>
+<title>A Farm — Admin</title>
 <link rel="stylesheet" href="styles.css">
+<script src="products-data.js"></script>
 <style>
-  body{ padding-top:20px; padding-bottom:40px; max-width:720px; margin:0 auto; }
-  .admin-header{ padding:0 20px 12px; }
+  body{ padding-top:20px; padding-bottom:50px; max-width:760px; margin:0 auto; }
+  .admin-header{ padding:0 20px 8px; }
   .admin-header h1{ font-size:26px; }
+  .admin-section{
+    margin:22px 20px 0; padding:18px; border:1px solid var(--line);
+    border-radius:var(--radius-lg); background:var(--card); box-shadow:var(--shadow-sm);
+  }
+  .admin-section h2{ font-size:19px; margin-bottom:4px; }
+  .admin-section .section-note{ font-size:13px; margin-bottom:14px; }
+
+  /* Products */
+  .admin-product-row{
+    display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .admin-product-row:last-child{ border-bottom:none; }
+  .admin-product-name{ flex:1; min-width:140px; font-weight:600; font-size:14px; }
+  .admin-product-cat{ font-size:11.5px; color:var(--ink-soft); display:block; font-weight:500; }
+  .admin-price-input{
+    width:80px; height:38px; border-radius:var(--radius-sm); border:1px solid var(--line);
+    padding:0 8px; font-size:14px; text-align:right;
+  }
+  .admin-stock-toggle{
+    height:38px; padding:0 14px; border-radius:999px; border:1px solid var(--line);
+    background:var(--linen); font-size:12.5px; font-weight:700; cursor:pointer;
+  }
+  .admin-stock-toggle.in-stock{ background:var(--leaf-dim); color:var(--leaf); border-color:transparent; }
+  .admin-stock-toggle.out-of-stock{ background:#FBE4DC; color:var(--brick-dark); border-color:transparent; }
+  .admin-category-filter{ margin-bottom:14px; }
+  .admin-category-filter select{ height:40px; border-radius:var(--radius-sm); border:1px solid var(--line); padding:0 10px; font-size:14px; }
+
+  /* Coupons */
+  .coupon-form{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .coupon-form input, .coupon-form select{
+    height:40px; border-radius:var(--radius-sm); border:1px solid var(--line); padding:0 10px; font-size:14px;
+  }
+  .coupon-form input[type=text]{ flex:1; min-width:100px; text-transform:uppercase; }
+  .coupon-list-row{
+    display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:14px;
+  }
+  .coupon-list-row:last-child{ border-bottom:none; }
+  .coupon-code{ font-weight:700; font-family:'Fraunces',serif; }
+  .coupon-value{ color:var(--ink-soft); flex:1; }
+  .coupon-remove{ background:none; border:none; color:var(--brick); font-weight:600; cursor:pointer; font-size:13px; }
+
+  /* Points rate */
+  .rate-form{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .rate-form input{ width:80px; height:40px; border-radius:var(--radius-sm); border:1px solid var(--line); padding:0 10px; font-size:14px; text-align:center; }
+  .rate-current{ font-size:13.5px; font-weight:600; color:var(--leaf); margin-top:10px; }
+
+  /* Orders */
   .order-card{
-    margin:0 20px 14px; padding:16px; border:1px solid var(--line);
-    border-radius:var(--radius-md); background:var(--card); box-shadow:var(--shadow-sm);
+    margin:0 0 14px; padding:14px; border:1px solid var(--line);
+    border-radius:var(--radius-md); background:var(--linen);
   }
   .order-card-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
-  .order-id{ font-family:'Fraunces',serif; font-weight:700; font-size:18px; }
-  .order-total{ font-weight:700; }
-  .order-meta{ font-size:12.5px; color:var(--ink-soft); margin:2px 0 8px; }
-  .order-items{ font-size:14px; margin-bottom:10px; }
+  .order-id{ font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
+  .order-meta{ font-size:12px; color:var(--ink-soft); margin:2px 0 8px; }
+  .order-items{ font-size:13.5px; margin-bottom:10px; }
   .status-row{ display:flex; gap:6px; flex-wrap:wrap; }
   .status-chip{
-    padding:8px 12px; border-radius:999px; border:1px solid var(--line);
-    background:var(--linen); font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink-soft);
+    padding:7px 11px; border-radius:999px; border:1px solid var(--line);
+    background:var(--card); font-size:12px; font-weight:600; cursor:pointer; color:var(--ink-soft);
   }
   .status-chip.current{ background:var(--ink); color:#fff; border-color:var(--ink); }
-  .empty-note{ padding:0 20px; }
+  .empty-note{ font-size:14px; color:var(--ink-soft); }
+  .save-hint{ font-size:12px; color:var(--ink-soft); margin-top:10px; }
 </style>
 </head>
 <body>
   <div class="admin-header">
-    <h1>A Farm — Orders</h1>
-    <p class="view-sub">Tap a status to move an order forward. This reads the order history saved in this browser's storage — open it on the same device/browser customers are ordering from.</p>
+    <h1>A Farm — Admin</h1>
+    <p class="view-sub">Changes here save to this browser's storage and apply the next time the site (or this page) loads. Open on the same device customers use, or repeat changes on each device you manage from.</p>
   </div>
-  <div id="ordersList"></div>
-  <p class="empty-note" id="emptyNote" hidden>No orders yet.</p>
+
+  <!-- ================= PRODUCTS: STOCK + PRICE ================= -->
+  <div class="admin-section">
+    <h2>Products — Stock &amp; Price</h2>
+    <p class="section-note">Toggle in stock / out of stock, or edit a price. Blank price fields mean "price available at farm" and are left as-is unless you set one.</p>
+    <div class="admin-category-filter">
+      <select id="categoryFilter"></select>
+    </div>
+    <div id="productsList"></div>
+    <p class="save-hint">Changes save instantly as you edit — no separate save button.</p>
+  </div>
+
+  <!-- ================= COUPONS ================= -->
+  <div class="admin-section">
+    <h2>Coupons</h2>
+    <p class="section-note">Customers enter these codes at checkout. Flat = dollars off; Percent = % off the order.</p>
+    <div class="coupon-form">
+      <input type="text" id="newCouponCode" placeholder="CODE">
+      <select id="newCouponType">
+        <option value="flat">$ off</option>
+        <option value="percent">% off</option>
+      </select>
+      <input type="number" id="newCouponValue" placeholder="Value" min="0" step="0.5">
+      <button class="btn btn-primary btn-sm" id="addCouponBtn">Add</button>
+    </div>
+    <div id="couponsList"></div>
+    <p class="empty-note" id="couponsEmpty" hidden>No coupons yet.</p>
+  </div>
+
+  <!-- ================= POINTS REDEMPTION RATE ================= -->
+  <div class="admin-section">
+    <h2>Points Redemption Rate</h2>
+    <p class="section-note">How many loyalty points equal $1 off at checkout. Leave unset to hide point redemption from customers.</p>
+    <div class="rate-form">
+      <input type="number" id="pointsPerDollarInput" min="1" step="1" placeholder="e.g. 20">
+      <span>points = $1 off</span>
+      <button class="btn btn-primary btn-sm" id="saveRateBtn">Save</button>
+      <button class="btn btn-ghost btn-sm" id="clearRateBtn">Clear</button>
+    </div>
+    <p class="rate-current" id="rateCurrent"></p>
+  </div>
+
+  <!-- ================= ORDERS ================= -->
+  <div class="admin-section">
+    <h2>Orders</h2>
+    <p class="section-note">Tap a status to move an order forward, or mark it Returned.</p>
+    <div id="ordersList"></div>
+    <p class="empty-note" id="ordersEmpty" hidden>No orders yet.</p>
+  </div>
 
 <script>
-const STATUS_PIPELINE = ["Order Received", "Preparing", "Ready", "Completed"];
+const STATUS_PIPELINE = ["Order Received", "Preparing", "Ready", "Completed", "Returned"];
 
 function money(n){ return "$" + Number(n).toFixed(2); }
 
-function loadAccount(){
-  try{
-    return JSON.parse(localStorage.getItem("afarm_account")) || { history: [] };
-  }catch(e){
-    return { history: [] };
-  }
+/* ---------- storage helpers (same keys the customer app reads) ---------- */
+function getOverrides(){
+  try{ return JSON.parse(localStorage.getItem("afarm_admin_overrides")) || {}; }
+  catch(e){ return {}; }
 }
-function saveAccount(account){
-  localStorage.setItem("afarm_account", JSON.stringify(account));
+function saveOverrides(ov){ localStorage.setItem("afarm_admin_overrides", JSON.stringify(ov)); }
+
+function getCoupons(){
+  try{ return JSON.parse(localStorage.getItem("afarm_coupons")) || []; }
+  catch(e){ return []; }
+}
+function saveCoupons(list){ localStorage.setItem("afarm_coupons", JSON.stringify(list)); }
+
+function getRate(){
+  try{ return JSON.parse(localStorage.getItem("afarm_redemption_rate")); }
+  catch(e){ return null; }
+}
+function saveRate(rate){ localStorage.setItem("afarm_redemption_rate", JSON.stringify(rate)); }
+function clearRate(){ localStorage.removeItem("afarm_redemption_rate"); }
+
+function getAccount(){
+  try{ return JSON.parse(localStorage.getItem("afarm_account")) || { history: [] }; }
+  catch(e){ return { history: [] }; }
+}
+function saveAccount(a){ localStorage.setItem("afarm_account", JSON.stringify(a)); }
+
+function categoryLabel(key){
+  const c = CATEGORIES.find(c => c.key === key);
+  return c ? c.label : key;
 }
 
+/* ---------------------------------------------------------------------
+   PRODUCTS: STOCK + PRICE
+--------------------------------------------------------------------- */
+function renderCategoryFilter(){
+  const sel = document.getElementById("categoryFilter");
+  sel.innerHTML = '<option value="all">All categories</option>' +
+    CATEGORIES.map(c => '<option value="' + c.key + '">' + c.label + '</option>').join("");
+  sel.addEventListener("change", renderProducts);
+}
+
+function renderProducts(){
+  const filter = document.getElementById("categoryFilter").value;
+  const overrides = getOverrides();
+  const list = document.getElementById("productsList");
+  list.innerHTML = "";
+
+  PRODUCTS.filter(p => !p.isBasketProduct && (filter === "all" || p.category === filter)).forEach(p => {
+    const ov = overrides[p.id] || {};
+    const effectivePrice = ov.price != null ? ov.price : p.price;
+    const effectiveAvailable = ov.available != null ? ov.available : p.available;
+
+    const row = document.createElement("div");
+    row.className = "admin-product-row";
+
+    const name = document.createElement("div");
+    name.className = "admin-product-name";
+    name.innerHTML = p.name + '<span class="admin-product-cat">' + categoryLabel(p.category) + '</span>';
+    row.appendChild(name);
+
+    const priceInput = document.createElement("input");
+    priceInput.type = "number";
+    priceInput.className = "admin-price-input";
+    priceInput.min = "0";
+    priceInput.step = "0.01";
+    priceInput.placeholder = "price";
+    if(effectivePrice != null) priceInput.value = effectivePrice;
+    priceInput.addEventListener("change", () => {
+      const ov2 = getOverrides();
+      ov2[p.id] = ov2[p.id] || {};
+      const val = priceInput.value === "" ? null : Number(priceInput.value);
+      if(val == null || isNaN(val) || val < 0){
+        delete ov2[p.id].price;
+      } else {
+        ov2[p.id].price = val;
+      }
+      if(Object.keys(ov2[p.id]).length === 0) delete ov2[p.id];
+      saveOverrides(ov2);
+    });
+    row.appendChild(priceInput);
+
+    const stockBtn = document.createElement("button");
+    stockBtn.className = "admin-stock-toggle " + (effectiveAvailable ? "in-stock" : "out-of-stock");
+    stockBtn.textContent = effectiveAvailable ? "In Stock" : "Out of Stock";
+    stockBtn.addEventListener("click", () => {
+      const ov2 = getOverrides();
+      ov2[p.id] = ov2[p.id] || {};
+      ov2[p.id].available = !effectiveAvailable;
+      saveOverrides(ov2);
+      renderProducts();
+    });
+    row.appendChild(stockBtn);
+
+    list.appendChild(row);
+  });
+}
+
+/* ---------------------------------------------------------------------
+   COUPONS
+--------------------------------------------------------------------- */
+function renderCoupons(){
+  const coupons = getCoupons();
+  const list = document.getElementById("couponsList");
+  const empty = document.getElementById("couponsEmpty");
+  list.innerHTML = "";
+  empty.hidden = coupons.length > 0;
+  coupons.forEach((c, index) => {
+    const row = document.createElement("div");
+    row.className = "coupon-list-row";
+    const valueText = c.type === "percent" ? c.value + "% off" : money(c.value) + " off";
+    row.innerHTML =
+      '<span class="coupon-code">' + c.code + '</span>' +
+      '<span class="coupon-value">' + valueText + (c.active ? "" : " · inactive") + '</span>';
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "coupon-remove";
+    toggleBtn.textContent = c.active ? "Deactivate" : "Activate";
+    toggleBtn.addEventListener("click", () => {
+      const list2 = getCoupons();
+      list2[index].active = !list2[index].active;
+      saveCoupons(list2);
+      renderCoupons();
+    });
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "coupon-remove";
+    removeBtn.textContent = "Delete";
+    removeBtn.addEventListener("click", () => {
+      const list2 = getCoupons();
+      list2.splice(index, 1);
+      saveCoupons(list2);
+      renderCoupons();
+    });
+    row.appendChild(toggleBtn);
+    row.appendChild(removeBtn);
+    list.appendChild(row);
+  });
+}
+
+document.getElementById("addCouponBtn").addEventListener("click", () => {
+  const codeInput = document.getElementById("newCouponCode");
+  const code = codeInput.value.trim().toUpperCase();
+  const type = document.getElementById("newCouponType").value;
+  const value = Number(document.getElementById("newCouponValue").value);
+  if(!code || !isFinite(value) || value <= 0){
+    alert("Enter a code and a positive value first.");
+    return;
+  }
+  const coupons = getCoupons();
+  if(coupons.some(c => c.code === code)){
+    alert("That code already exists.");
+    return;
+  }
+  coupons.push({ code, type, value, active: true });
+  saveCoupons(coupons);
+  codeInput.value = "";
+  document.getElementById("newCouponValue").value = "";
+  renderCoupons();
+});
+
+/* ---------------------------------------------------------------------
+   POINTS REDEMPTION RATE
+--------------------------------------------------------------------- */
+function renderRate(){
+  const rate = getRate();
+  const input = document.getElementById("pointsPerDollarInput");
+  const current = document.getElementById("rateCurrent");
+  if(rate && rate.pointsPerDollar > 0){
+    input.value = rate.pointsPerDollar;
+    current.textContent = "Currently: " + rate.pointsPerDollar + " points = $1 off";
+  } else {
+    input.value = "";
+    current.textContent = "No rate set — point redemption is hidden from customers.";
+  }
+}
+document.getElementById("saveRateBtn").addEventListener("click", () => {
+  const val = Number(document.getElementById("pointsPerDollarInput").value);
+  if(!isFinite(val) || val <= 0){
+    alert("Enter a positive number of points per dollar.");
+    return;
+  }
+  saveRate({ pointsPerDollar: Math.floor(val) });
+  renderRate();
+});
+document.getElementById("clearRateBtn").addEventListener("click", () => {
+  clearRate();
+  renderRate();
+});
+
+/* ---------------------------------------------------------------------
+   ORDERS
+--------------------------------------------------------------------- */
 function renderOrders(){
-  const account = loadAccount();
+  const account = getAccount();
   const list = document.getElementById("ordersList");
-  const emptyNote = document.getElementById("emptyNote");
+  const empty = document.getElementById("ordersEmpty");
   list.innerHTML = "";
   const history = account.history || [];
-  emptyNote.hidden = history.length > 0;
+  empty.hidden = history.length > 0;
   history.forEach((o, index) => list.appendChild(buildOrderCard(o, index)));
 }
 
@@ -67,13 +342,14 @@ function buildOrderCard(o, index){
 
   const top = document.createElement("div");
   top.className = "order-card-top";
-  top.innerHTML = '<span class="order-id">Order #' + (o.orderId || index + 1) + '</span><span class="order-total">' + money(o.total) + '</span>';
+  top.innerHTML = '<span class="order-id">Order #' + (o.orderId || index + 1) + '</span><span>' + money(o.total) + '</span>';
   card.appendChild(top);
 
   const meta = document.createElement("div");
   meta.className = "order-meta";
-  const when = new Date(o.date).toLocaleString();
-  meta.textContent = when + " · +" + o.pointsEarned + " pts";
+  meta.textContent = new Date(o.date).toLocaleString() + " · +" + o.pointsEarned + " pts" +
+    (o.couponCode ? " · coupon " + o.couponCode : "") +
+    (o.pointsRedeemed ? " · " + o.pointsRedeemed + " pts redeemed" : "");
   card.appendChild(meta);
 
   const items = document.createElement("div");
@@ -88,7 +364,7 @@ function buildOrderCard(o, index){
     const chip = document.createElement("button");
     chip.className = "status-chip" + (currentStatus === s ? " current" : "");
     chip.textContent = s;
-    chip.addEventListener("click", () => updateStatus(index, s));
+    chip.addEventListener("click", () => updateOrderStatus(index, s));
     statusRow.appendChild(chip);
   });
   card.appendChild(statusRow);
@@ -96,14 +372,21 @@ function buildOrderCard(o, index){
   return card;
 }
 
-function updateStatus(index, status){
-  const account = loadAccount();
+function updateOrderStatus(index, status){
+  const account = getAccount();
   if(!account.history || !account.history[index]) return;
   account.history[index].status = status;
   saveAccount(account);
   renderOrders();
 }
 
+/* ---------------------------------------------------------------------
+   INIT
+--------------------------------------------------------------------- */
+renderCategoryFilter();
+renderProducts();
+renderCoupons();
+renderRate();
 renderOrders();
 </script>
 </body>
