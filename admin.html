@@ -66,6 +66,7 @@
   .order-id{ font-family:'Fraunces',serif; font-weight:700; font-size:16px; }
   .order-meta{ font-size:12px; color:var(--ink-soft); margin:2px 0 8px; }
   .order-items{ font-size:13.5px; margin-bottom:10px; }
+  .order-delivery{ font-size:12.5px; font-weight:600; color:var(--brick-dark); margin-bottom:10px; }
   .status-row{ display:flex; gap:6px; flex-wrap:wrap; }
   .status-chip{
     padding:7px 11px; border-radius:999px; border:1px solid var(--line);
@@ -90,10 +91,11 @@
   <!-- ================= PASSCODE LOCK ================= -->
   <div id="lockOverlay" class="lock-overlay">
     <div class="lock-card">
-      <h1 id="lockTitle">Admin Passcode</h1>
+      <h1 id="lockTitle">Admin Login</h1>
       <p class="view-sub" id="lockSub"></p>
       <form id="lockForm">
-        <input type="password" id="lockInput" class="field-input" placeholder="Passcode" autocomplete="off" inputmode="text">
+        <input type="email" id="lockEmail" class="field-input" placeholder="Admin email" autocomplete="username">
+        <input type="password" id="lockInput" class="field-input" placeholder="Password" autocomplete="off">
         <p class="checkout-note bad" id="lockError"></p>
         <button type="submit" class="btn btn-primary btn-block">Continue</button>
       </form>
@@ -382,10 +384,10 @@ function renderOrders(){
   list.innerHTML = "";
   const history = account.history || [];
   empty.hidden = history.length > 0;
-  history.forEach((o, index) => list.appendChild(buildOrderCard(o, index)));
+  history.forEach((o, index) => list.appendChild(buildOrderCard(o, index, account)));
 }
 
-function buildOrderCard(o, index){
+function buildOrderCard(o, index, account){
   const card = document.createElement("div");
   card.className = "order-card";
 
@@ -405,6 +407,14 @@ function buildOrderCard(o, index){
   items.className = "order-items";
   items.textContent = o.items;
   card.appendChild(items);
+
+  if(o.delivery){
+    const contactBits = [account.name, account.phone, account.email].filter(Boolean).join(" · ");
+    const delivery = document.createElement("div");
+    delivery.className = "order-delivery";
+    delivery.textContent = "Deliver to: " + o.deliveryAddress + (contactBits ? " · " + contactBits : "");
+    card.appendChild(delivery);
+  }
 
   const statusRow = document.createElement("div");
   statusRow.className = "status-row";
@@ -453,12 +463,13 @@ function initAdminPanel(){
 function showLock(){
   document.getElementById("lockOverlay").hidden = false;
   document.getElementById("adminContent").hidden = true;
-  const storedHash = localStorage.getItem("afarm_admin_pass_hash");
-  document.getElementById("lockTitle").textContent = storedHash ? "Admin Passcode" : "Set an Admin Passcode";
-  document.getElementById("lockSub").textContent = storedHash
-    ? "Enter the passcode to manage this farm's site."
-    : "Choose a passcode now. You'll need it here again next time you open this page in a new browser session.";
+  const storedEmail = localStorage.getItem("afarm_admin_email");
+  document.getElementById("lockTitle").textContent = storedEmail ? "Admin Login" : "Set Up Admin Login";
+  document.getElementById("lockSub").textContent = storedEmail
+    ? "Enter your admin email and password to manage this farm's site."
+    : "Choose the email and password you'll use to log into admin. You'll need them here again next time you open this page in a new browser session.";
   document.getElementById("lockError").textContent = "";
+  document.getElementById("lockEmail").value = storedEmail || "";
   document.getElementById("lockInput").value = "";
 }
 
@@ -471,29 +482,38 @@ function unlockAdmin(){
 
 document.getElementById("lockForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const val = document.getElementById("lockInput").value;
+  const email = document.getElementById("lockEmail").value.trim().toLowerCase();
+  const password = document.getElementById("lockInput").value;
+  const storedEmail = localStorage.getItem("afarm_admin_email");
   const storedHash = localStorage.getItem("afarm_admin_pass_hash");
   const errorEl = document.getElementById("lockError");
 
-  if(!storedHash){
-    if(val.length < 4){
-      errorEl.textContent = "Choose at least 4 characters.";
+  if(!email || !email.includes("@")){
+    errorEl.textContent = "Enter a valid email.";
+    return;
+  }
+
+  if(!storedEmail){
+    if(password.length < 4){
+      errorEl.textContent = "Choose a password of at least 4 characters.";
       return;
     }
-    localStorage.setItem("afarm_admin_pass_hash", await sha256Hex(val));
+    localStorage.setItem("afarm_admin_email", email);
+    localStorage.setItem("afarm_admin_pass_hash", await sha256Hex(password));
     unlockAdmin();
     return;
   }
 
-  if(await sha256Hex(val) === storedHash){
+  if(email === storedEmail && await sha256Hex(password) === storedHash){
     unlockAdmin();
   } else {
-    errorEl.textContent = "Wrong passcode.";
+    errorEl.textContent = "Wrong email or password.";
   }
 });
 
 document.getElementById("changePasscodeBtn").addEventListener("click", () => {
-  if(!confirm("Change the admin passcode? You'll need to set a new one now.")) return;
+  if(!confirm("Change the admin login? You'll need to set a new email/password now.")) return;
+  localStorage.removeItem("afarm_admin_email");
   localStorage.removeItem("afarm_admin_pass_hash");
   sessionStorage.removeItem("afarm_admin_unlocked");
   showLock();

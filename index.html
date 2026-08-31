@@ -214,12 +214,17 @@
     </div>
 
     <div class="account-panel">
-      <h3>Your Info <span class="optional-tag">(optional)</span></h3>
-      <p class="account-info-copy">Fully anonymous by default &mdash; your points already track on this device. Add your name and phone only if you want the farmer to look you up in person.</p>
+      <h3>Your Info</h3>
+      <p class="account-info-copy">Browsing and ordering work without this. Fill it in if you'd like the farmer to look you up, or if you want delivery. Name is required, plus at least a phone <em>or</em> email so you can be reached.</p>
       <label class="field-label" for="accountName">Name</label>
       <input type="text" id="accountName" class="field-input" placeholder="Your name" autocomplete="name">
       <label class="field-label" for="accountPhone">Phone</label>
       <input type="tel" id="accountPhone" class="field-input" placeholder="Your phone number" autocomplete="tel">
+      <label class="field-label" for="accountEmail">Email</label>
+      <input type="email" id="accountEmail" class="field-input" placeholder="Your email" autocomplete="email">
+      <label class="field-label" for="accountAddress">Delivery Address <span class="optional-tag">(optional — only if you want delivery)</span></label>
+      <input type="text" id="accountAddress" class="field-input" placeholder="Street address, city, zip" autocomplete="street-address">
+      <p class="checkout-note bad" id="accountInfoError"></p>
       <button class="btn btn-primary" id="saveAccountInfoBtn">Save Info</button>
     </div>
 
@@ -324,6 +329,12 @@
   <div id="orderSummaryBody"></div>
 
   <div class="checkout-extras">
+    <div id="deliveryOptionSection" hidden>
+      <label class="delivery-check">
+        <input type="checkbox" id="deliveryCheckbox">
+        <span>Deliver to <span id="deliveryAddressText"></span> instead of picking up</span>
+      </label>
+    </div>
     <div class="coupon-row">
       <input type="text" id="couponCodeInput" class="field-input" placeholder="Coupon code (optional)" autocapitalize="characters">
       <button class="btn btn-ghost btn-sm" id="applyCouponBtn">Apply</button>

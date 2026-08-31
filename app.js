@@ -53,7 +53,7 @@ const state = {
   cart: loadJSON("afarm_cart", []),        // [{id, qty}]
   basket: loadJSON("afarm_basket", []),    // [{id, qty}]
   basketPrice: BASKET_PRICE,
-  account: loadJSON("afarm_account", { name: "", phone: "", points: 0, history: [] }),
+  account: loadJSON("afarm_account", { name: "", phone: "", email: "", address: "", points: 0, history: [] }),
   recentlyViewed: loadJSON("afarm_recent", []),
   view: "home",
   shopFilter: "all",
@@ -593,6 +593,15 @@ function openOrderSummary(){
   document.getElementById("couponMessage").textContent = "";
   document.getElementById("couponMessage").className = "checkout-note";
 
+  const deliverySection = document.getElementById("deliveryOptionSection");
+  if(state.account.address){
+    deliverySection.hidden = false;
+    document.getElementById("deliveryAddressText").textContent = state.account.address;
+    document.getElementById("deliveryCheckbox").checked = false;
+  } else {
+    deliverySection.hidden = true;
+  }
+
   const rate = getRedemptionRate();
   const pointsSection = document.getElementById("pointsRedeemSection");
   if(rate && state.account.points > 0 && currentOrderValue() > 0){
@@ -877,6 +886,7 @@ function submitOrder(){
   submitBtn.disabled = true;
 
   const pointsEarned = Math.floor(finalTotal);
+  const wantsDelivery = state.account.address && document.getElementById("deliveryCheckbox").checked;
   state.account.points = Math.max(0, state.account.points - checkout.pointsRedeemed) + pointsEarned;
   state.account.history.unshift({
     orderId: Date.now(),
@@ -889,6 +899,8 @@ function submitOrder(){
     pointsRedeemed: checkout.pointsRedeemed,
     pointsDiscount: checkout.pointsDiscount,
     pointsEarned: pointsEarned,
+    delivery: !!wantsDelivery,
+    deliveryAddress: wantsDelivery ? state.account.address : "",
     status: "Order Received"
   });
   state.account.history = state.account.history.slice(0, 30);
@@ -947,6 +959,8 @@ function renderAccountView(){
 
   document.getElementById("accountName").value = state.account.name || "";
   document.getElementById("accountPhone").value = state.account.phone || "";
+  document.getElementById("accountEmail").value = state.account.email || "";
+  document.getElementById("accountAddress").value = state.account.address || "";
 
   const historyList = document.getElementById("orderHistoryList");
   const historyEmpty = document.getElementById("orderHistoryEmpty");
@@ -967,6 +981,9 @@ function renderAccountView(){
         if(h.couponCode) bits.push("Coupon " + h.couponCode + " (-" + money(h.couponDiscount) + ")");
         if(h.pointsRedeemed) bits.push(h.pointsRedeemed + " pts redeemed (-" + money(h.pointsDiscount) + ")");
         left.appendChild(el("div", "order-history-discount", bits.join(" · ")));
+      }
+      if(h.delivery){
+        left.appendChild(el("div", "order-history-discount", "Delivery to: " + h.deliveryAddress));
       }
       if(h.status === "Completed"){
         const returnBtn = el("button", "order-history-return", "Request Return");
@@ -989,8 +1006,26 @@ function requestReturn(index){
 }
 
 document.getElementById("saveAccountInfoBtn").addEventListener("click", () => {
-  state.account.name = document.getElementById("accountName").value.trim();
-  state.account.phone = document.getElementById("accountPhone").value.trim();
+  const name = document.getElementById("accountName").value.trim();
+  const phone = document.getElementById("accountPhone").value.trim();
+  const email = document.getElementById("accountEmail").value.trim();
+  const address = document.getElementById("accountAddress").value.trim();
+  const errorEl = document.getElementById("accountInfoError");
+
+  if(!name){
+    errorEl.textContent = "Name is required.";
+    return;
+  }
+  if(!phone && !email){
+    errorEl.textContent = "Enter a phone number or an email so you can be reached.";
+    return;
+  }
+  errorEl.textContent = "";
+
+  state.account.name = name;
+  state.account.phone = phone;
+  state.account.email = email;
+  state.account.address = address;
   saveState();
   toast("Your info is saved on this device");
 });
