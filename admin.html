@@ -74,18 +74,43 @@
   .status-chip.current{ background:var(--ink); color:#fff; border-color:var(--ink); }
   .empty-note{ font-size:14px; color:var(--ink-soft); }
   .save-hint{ font-size:12px; color:var(--ink-soft); margin-top:10px; }
+
+  /* Passcode lock */
+  .lock-overlay{
+    position:fixed; inset:0; z-index:100; background:var(--linen);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .lock-card{ width:100%; max-width:360px; }
+  .lock-card h1{ font-size:24px; margin-bottom:6px; }
+  .lock-card .field-input{ width:100%; height:48px; margin:14px 0 4px; font-size:16px; }
 </style>
 </head>
 <body>
+
+  <!-- ================= PASSCODE LOCK ================= -->
+  <div id="lockOverlay" class="lock-overlay">
+    <div class="lock-card">
+      <h1 id="lockTitle">Admin Passcode</h1>
+      <p class="view-sub" id="lockSub"></p>
+      <form id="lockForm">
+        <input type="password" id="lockInput" class="field-input" placeholder="Passcode" autocomplete="off" inputmode="text">
+        <p class="checkout-note bad" id="lockError"></p>
+        <button type="submit" class="btn btn-primary btn-block">Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="adminContent" hidden>
   <div class="admin-header">
     <h1>A Farm — Admin</h1>
     <p class="view-sub">Changes here save to this browser's storage and apply the next time the site (or this page) loads. Open on the same device customers use, or repeat changes on each device you manage from.</p>
+    <button class="btn btn-ghost btn-sm" id="changePasscodeBtn">Change Passcode</button>
   </div>
 
   <!-- ================= PRODUCTS: STOCK + PRICE ================= -->
   <div class="admin-section">
     <h2>Products — Stock &amp; Price</h2>
-    <p class="section-note">Toggle in stock / out of stock, or edit a price. Blank price fields mean "price available at farm" and are left as-is unless you set one.</p>
+    <p class="section-note">Toggle in stock / out of stock, edit a price, or set a max quantity per order (leave blank for the default cap). Blank price fields mean "price available at farm" and are left as-is unless you set one.</p>
     <div class="admin-category-filter">
       <select id="categoryFilter"></select>
     </div>
@@ -130,6 +155,7 @@
     <div id="ordersList"></div>
     <p class="empty-note" id="ordersEmpty" hidden>No orders yet.</p>
   </div>
+  </div><!-- /adminContent -->
 
 <script>
 const STATUS_PIPELINE = ["Order Received", "Preparing", "Ready", "Completed", "Returned"];
@@ -216,6 +242,29 @@ function renderProducts(){
       saveOverrides(ov2);
     });
     row.appendChild(priceInput);
+
+    const maxQtyInput = document.createElement("input");
+    maxQtyInput.type = "number";
+    maxQtyInput.className = "admin-price-input";
+    maxQtyInput.min = "1";
+    maxQtyInput.step = "1";
+    maxQtyInput.title = "Max quantity per order (blank = default cap)";
+    maxQtyInput.placeholder = "max qty";
+    const effectiveMaxQty = ov.maxQty != null ? ov.maxQty : "";
+    if(effectiveMaxQty !== "") maxQtyInput.value = effectiveMaxQty;
+    maxQtyInput.addEventListener("change", () => {
+      const ov2 = getOverrides();
+      ov2[p.id] = ov2[p.id] || {};
+      const val = maxQtyInput.value === "" ? null : parseInt(maxQtyInput.value, 10);
+      if(val == null || isNaN(val) || val < 1){
+        delete ov2[p.id].maxQty;
+      } else {
+        ov2[p.id].maxQty = val;
+      }
+      if(Object.keys(ov2[p.id]).length === 0) delete ov2[p.id];
+      saveOverrides(ov2);
+    });
+    row.appendChild(maxQtyInput);
 
     const stockBtn = document.createElement("button");
     stockBtn.className = "admin-stock-toggle " + (effectiveAvailable ? "in-stock" : "out-of-stock");
@@ -381,13 +430,85 @@ function updateOrderStatus(index, status){
 }
 
 /* ---------------------------------------------------------------------
+   PASSCODE LOCK
+   Client-side only (this is a static site) — a deterrent to keep
+   casual visitors out, not a substitute for real server-side auth.
+   First use sets the passcode; after that it's required each new
+   browser session (closing the tab locks it again).
+--------------------------------------------------------------------- */
+async function sha256Hex(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function initAdminPanel(){
+  renderCategoryFilter();
+  renderProducts();
+  renderCoupons();
+  renderRate();
+  renderOrders();
+}
+
+function showLock(){
+  document.getElementById("lockOverlay").hidden = false;
+  document.getElementById("adminContent").hidden = true;
+  const storedHash = localStorage.getItem("afarm_admin_pass_hash");
+  document.getElementById("lockTitle").textContent = storedHash ? "Admin Passcode" : "Set an Admin Passcode";
+  document.getElementById("lockSub").textContent = storedHash
+    ? "Enter the passcode to manage this farm's site."
+    : "Choose a passcode now. You'll need it here again next time you open this page in a new browser session.";
+  document.getElementById("lockError").textContent = "";
+  document.getElementById("lockInput").value = "";
+}
+
+function unlockAdmin(){
+  document.getElementById("lockOverlay").hidden = true;
+  document.getElementById("adminContent").hidden = false;
+  sessionStorage.setItem("afarm_admin_unlocked", "1");
+  initAdminPanel();
+}
+
+document.getElementById("lockForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const val = document.getElementById("lockInput").value;
+  const storedHash = localStorage.getItem("afarm_admin_pass_hash");
+  const errorEl = document.getElementById("lockError");
+
+  if(!storedHash){
+    if(val.length < 4){
+      errorEl.textContent = "Choose at least 4 characters.";
+      return;
+    }
+    localStorage.setItem("afarm_admin_pass_hash", await sha256Hex(val));
+    unlockAdmin();
+    return;
+  }
+
+  if(await sha256Hex(val) === storedHash){
+    unlockAdmin();
+  } else {
+    errorEl.textContent = "Wrong passcode.";
+  }
+});
+
+document.getElementById("changePasscodeBtn").addEventListener("click", () => {
+  if(!confirm("Change the admin passcode? You'll need to set a new one now.")) return;
+  localStorage.removeItem("afarm_admin_pass_hash");
+  sessionStorage.removeItem("afarm_admin_unlocked");
+  showLock();
+});
+
+/* ---------------------------------------------------------------------
    INIT
 --------------------------------------------------------------------- */
-renderCategoryFilter();
-renderProducts();
-renderCoupons();
-renderRate();
-renderOrders();
+if(sessionStorage.getItem("afarm_admin_unlocked") === "1" && localStorage.getItem("afarm_admin_pass_hash")){
+  document.getElementById("lockOverlay").hidden = true;
+  document.getElementById("adminContent").hidden = false;
+  initAdminPanel();
+} else {
+  showLock();
+}
 </script>
 </body>
 </html>

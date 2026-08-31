@@ -407,19 +407,26 @@ function addRecentlyViewed(id){
 /* ---------------------------------------------------------------------
    CART LOGIC
 --------------------------------------------------------------------- */
+/* Default per-item cap. The admin panel can set a tighter maxQty on
+   any specific product (e.g. a low-stock item) — that overrides this. */
 const MAX_CART_QTY = 20;
+
+function qtyCapFor(p){
+  return (p.maxQty && p.maxQty > 0) ? p.maxQty : MAX_CART_QTY;
+}
 
 function addToCart(id, qty){
   const p = getProduct(id);
   if(!p || p.price == null || !isAvailable(p)) return;
+  const cap = qtyCapFor(p);
   qty = Math.max(1, Math.floor(Number(qty)) || 1);
   const existing = state.cart.find(l => l.id === id);
   if(existing){
-    const wasCapped = existing.qty + qty > MAX_CART_QTY;
-    existing.qty = Math.min(MAX_CART_QTY, existing.qty + qty);
-    if(wasCapped) toast("Max " + MAX_CART_QTY + " per order");
+    const wasCapped = existing.qty + qty > cap;
+    existing.qty = Math.min(cap, existing.qty + qty);
+    if(wasCapped) toast("Max " + cap + " per order for " + p.name);
   } else {
-    state.cart.push({ id, qty: Math.min(MAX_CART_QTY, qty) });
+    state.cart.push({ id, qty: Math.min(cap, qty) });
   }
   saveState();
   renderCartBadges();
@@ -430,12 +437,14 @@ function addToCart(id, qty){
 function setCartQty(id, qty){
   const line = state.cart.find(l => l.id === id);
   if(!line) return;
+  const p = getProduct(id);
+  const cap = p ? qtyCapFor(p) : MAX_CART_QTY;
   qty = Math.floor(Number(qty)) || 0;
   if(qty <= 0){
     state.cart = state.cart.filter(l => l.id !== id);
-  } else if(qty > MAX_CART_QTY){
-    line.qty = MAX_CART_QTY;
-    toast("Max " + MAX_CART_QTY + " per order");
+  } else if(qty > cap){
+    line.qty = cap;
+    toast("Max " + cap + " per order" + (p ? " for " + p.name : ""));
   } else {
     line.qty = qty;
   }
