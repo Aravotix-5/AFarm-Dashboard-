@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FAF7F1">
 <title>A Farm — Fresh From the Field</title>
-<meta name="description" content="A Farm's digital menu. Browse fresh vegetables, fruits, herbs and flowers grown at our family farm.">
+<meta name="description" content="A Farm's digital menu. Browse fresh tomatoes, peppers, squash, beans, okra, and herbs grown at our family farm.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -29,7 +29,7 @@
   </div>
   <div class="search-row">
     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input type="search" id="searchInput" placeholder="Search produce, flowers, seeds..." aria-label="Search products">
+    <input type="search" id="searchInput" placeholder="Search tomatoes, peppers, herbs..." aria-label="Search products">
   </div>
 </header>
 
@@ -45,7 +45,6 @@
   <ul class="nav-links">
     <li><a href="#home" data-nav="home">Home</a></li>
     <li><a href="#shop" data-nav="shop">Shop All</a></li>
-    <li><a href="#flowers" data-nav="flowers">Flowers</a></li>
     <li><a href="#basket" data-nav="basket">$30 Basket</a></li>
     <li><a href="#cart" data-nav="cart">Cart</a></li>
     <li><a href="#account" data-nav="account">My Account &amp; Points</a></li>
@@ -69,7 +68,7 @@
       <div class="hero-content">
         <p class="eyebrow">A family-owned backyard farm · Virginia</p>
         <h1>A Farm</h1>
-        <p class="hero-sub">Fresh vegetables, fruits, herbs and flowers, grown by hand and picked to order.</p>
+        <p class="hero-sub">Fresh tomatoes, peppers, squash and more, grown by hand and picked to order.</p>
         <div class="hero-actions">
           <a href="#shop" class="btn btn-primary" data-nav="shop">Browse All Products</a>
           <a href="#basket" class="btn btn-ghost" data-nav="basket">Build a $30 Basket</a>
@@ -86,14 +85,6 @@
         <h2>Featured Products</h2>
       </div>
       <div class="rail" id="featuredProductsRail"></div>
-    </section>
-
-    <section class="rail-section">
-      <div class="rail-head">
-        <h2>Featured Flowers</h2>
-        <a href="#flowers" class="rail-link" data-nav="flowers">See all</a>
-      </div>
-      <div class="rail" id="featuredFlowersRail"></div>
     </section>
 
     <section class="seasonal-band">
@@ -146,15 +137,6 @@
     <div class="filter-row" id="filterRow"></div>
     <div class="results-info" id="resultsInfo" hidden></div>
     <div id="shopCategories"></div>
-  </section>
-
-  <!-- ============ FLOWERS VIEW ============ -->
-  <section class="view" id="view-flowers" data-view="flowers">
-    <div class="view-header">
-      <h1>Flowers</h1>
-      <p class="view-sub">Fresh-cut and growing beauties from the farm. Pricing for individual flowers is confirmed at the farm.</p>
-    </div>
-    <div class="product-grid" id="flowersGrid"></div>
   </section>
 
   <!-- ============ BASKET VIEW ============ -->

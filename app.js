@@ -86,16 +86,12 @@ function priceLabel(p){
   return money(p.price) + (p.unit === "each" ? " each" : p.unit === "packet" ? "/packet" : p.unit === "basket" ? "" : "/" + p.unit);
 }
 
-/* Only these groups are currently being sold — everything else on the
-   menu is real, confirmed produce, just not being offered right now
-   and shows as Sold Out. Update this list when what's being sold changes. */
-const CURRENTLY_ORDERABLE_CATEGORIES = ["tomatoes", "peppers"];
-const CURRENTLY_ORDERABLE_IDS = ["veg-cauliflower", "veg-eggplant"];
-
+/* The catalog now only contains what's actually being sold, so plain
+   per-item availability is all that's needed (no separate "orderable
+   group" restriction like before the catalog was trimmed). */
 function isAvailable(p){
   if(p.isBasketProduct) return true;
-  const inOrderableGroup = CURRENTLY_ORDERABLE_CATEGORIES.includes(p.category) || CURRENTLY_ORDERABLE_IDS.includes(p.id);
-  return inOrderableGroup && p.available === true;
+  return p.available === true;
 }
 
 function mediaPlaceholderText(p){
@@ -198,7 +194,7 @@ function buildProductCard(p){
    use a two-part hash, #product/<id>, so each item is a real linkable
    page rather than a popup.
 --------------------------------------------------------------------- */
-const VIEW_IDS = ["home","shop","flowers","basket","cart","account","about","product"];
+const VIEW_IDS = ["home","shop","basket","cart","account","about","product"];
 
 function currentRoute(){
   const raw = (location.hash || "#home").replace(/^#/, "");
@@ -225,7 +221,6 @@ function goToView(view, productId){
 function renderCurrentView(productId){
   if(state.view === "home") renderHome();
   if(state.view === "shop") renderShop();
-  if(state.view === "flowers") renderFlowers();
   if(state.view === "basket") renderBasketView();
   if(state.view === "cart") renderCartView();
   if(state.view === "account") renderAccountView();
@@ -242,11 +237,9 @@ window.addEventListener("hashchange", () => {
 --------------------------------------------------------------------- */
 function renderHome(){
   const featured = liveProducts().filter(p => p.featured);
-  const flowers = liveProducts().filter(p => p.category === "flowers").slice(0, 6);
   const seasonal = liveProducts().filter(p => p.seasonal);
 
   fillRail("featuredProductsRail", featured);
-  fillRail("featuredFlowersRail", flowers);
   fillRail("seasonalRail", seasonal.length ? seasonal : featured);
 
   const grid = document.getElementById("homeCategoryGrid");
@@ -259,8 +252,7 @@ function renderHome(){
       '<span class="cat-name">' + c.label + '</span>' +
       '<span class="cat-count">' + count + " item" + (count === 1 ? "" : "s") + '</span>';
     tile.addEventListener("click", () => {
-      if(c.key === "flowers"){ location.hash = "#flowers"; }
-      else { state.shopFilter = c.key; location.hash = "#shop"; }
+      state.shopFilter = c.key; location.hash = "#shop";
     });
     grid.appendChild(tile);
   });
@@ -277,11 +269,13 @@ function fillRail(elId, products){
 --------------------------------------------------------------------- */
 const SHOP_FILTER_GROUPS = [
   { key: "all",        label: "All" },
+  { key: "tomatoes",   label: "Tomatoes" },
+  { key: "peppers",    label: "Peppers" },
   { key: "vegetables", label: "Vegetables" },
-  { key: "fruits",     label: "Fruits" },
+  { key: "squash",     label: "Squash & Zucchini" },
+  { key: "beans",      label: "Beans" },
+  { key: "okra",       label: "Okra" },
   { key: "herbs",      label: "Herbs" },
-  { key: "flowers",    label: "Flowers" },
-  { key: "seeds",      label: "Seeds" },
   { key: "baskets",    label: "Baskets" }
 ];
 
@@ -298,9 +292,6 @@ function renderShopFilters(){
 
 function matchesShopFilter(p){
   if(state.shopFilter === "all") return true;
-  if(state.shopFilter === "vegetables"){
-    return ["vegetables","tomatoes","peppers","root","squash","beans","okra","potatoes"].includes(p.category);
-  }
   return p.category === state.shopFilter;
 }
 
@@ -353,21 +344,11 @@ function renderShop(){
 }
 
 /* ---------------------------------------------------------------------
-   FLOWERS VIEW
---------------------------------------------------------------------- */
-function renderFlowers(){
-  const grid = document.getElementById("flowersGrid");
-  grid.innerHTML = "";
-  liveProducts().filter(p => p.category === "flowers" && matchesSearch(p)).forEach(p => grid.appendChild(buildProductCard(p)));
-}
-
-/* ---------------------------------------------------------------------
    SEARCH
 --------------------------------------------------------------------- */
 document.getElementById("searchInput").addEventListener("input", (e) => {
   state.searchTerm = e.target.value.trim();
   if(state.view === "shop") renderShop();
-  else if(state.view === "flowers") renderFlowers();
   else if(state.searchTerm){ location.hash = "#shop"; }
 });
 
