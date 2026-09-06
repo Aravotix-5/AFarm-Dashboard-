@@ -445,11 +445,20 @@ function updateOrderStatus(index, status){
    casual visitors out, not a substitute for real server-side auth.
    First use sets the passcode; after that it's required each new
    browser session (closing the tab locks it again).
+
+   Uses a plain synchronous hash (no Web Crypto API) on purpose — the
+   crypto.subtle API only exists in secure contexts (https/localhost)
+   and silently doesn't exist when a file is opened directly
+   (file://), which froze the login with no error message. This works
+   identically everywhere, and since this was always a deterrent
+   rather than real security, nothing is lost by simplifying it.
 --------------------------------------------------------------------- */
-async function sha256Hex(text){
-  const enc = new TextEncoder().encode(text);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+function simpleHash(text){
+  let hash = 0;
+  for(let i = 0; i < text.length; i++){
+    hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+  }
+  return String(hash);
 }
 
 function initAdminPanel(){
@@ -480,34 +489,38 @@ function unlockAdmin(){
   initAdminPanel();
 }
 
-document.getElementById("lockForm").addEventListener("submit", async (e) => {
+document.getElementById("lockForm").addEventListener("submit", (e) => {
   e.preventDefault();
-  const email = document.getElementById("lockEmail").value.trim().toLowerCase();
-  const password = document.getElementById("lockInput").value;
-  const storedEmail = localStorage.getItem("afarm_admin_email");
-  const storedHash = localStorage.getItem("afarm_admin_pass_hash");
-  const errorEl = document.getElementById("lockError");
+  try{
+    const email = document.getElementById("lockEmail").value.trim().toLowerCase();
+    const password = document.getElementById("lockInput").value;
+    const storedEmail = localStorage.getItem("afarm_admin_email");
+    const storedHash = localStorage.getItem("afarm_admin_pass_hash");
+    const errorEl = document.getElementById("lockError");
 
-  if(!email || !email.includes("@")){
-    errorEl.textContent = "Enter a valid email.";
-    return;
-  }
-
-  if(!storedEmail){
-    if(password.length < 4){
-      errorEl.textContent = "Choose a password of at least 4 characters.";
+    if(!email || !email.includes("@")){
+      errorEl.textContent = "Enter a valid email.";
       return;
     }
-    localStorage.setItem("afarm_admin_email", email);
-    localStorage.setItem("afarm_admin_pass_hash", await sha256Hex(password));
-    unlockAdmin();
-    return;
-  }
 
-  if(email === storedEmail && await sha256Hex(password) === storedHash){
-    unlockAdmin();
-  } else {
-    errorEl.textContent = "Wrong email or password.";
+    if(!storedEmail){
+      if(password.length < 4){
+        errorEl.textContent = "Choose a password of at least 4 characters.";
+        return;
+      }
+      localStorage.setItem("afarm_admin_email", email);
+      localStorage.setItem("afarm_admin_pass_hash", simpleHash(password));
+      unlockAdmin();
+      return;
+    }
+
+    if(email === storedEmail && simpleHash(password) === storedHash){
+      unlockAdmin();
+    } else {
+      errorEl.textContent = "Wrong email or password.";
+    }
+  }catch(err){
+    document.getElementById("lockError").textContent = "Something went wrong logging in. Try again, or use Change Passcode below to reset.";
   }
 });
 

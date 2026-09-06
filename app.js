@@ -386,6 +386,8 @@ function renderProductPage(id){
 
   fillMediaEl(document.getElementById("productPageMedia"), p, { controls: !!p.video });
 
+  document.getElementById("productPageDescription").textContent = p.description || "";
+
   const addBtn = document.getElementById("productPageAddBtn");
   addBtn.disabled = !isAvailable(p) || p.price == null;
   addBtn.textContent = addBtn.disabled ? (p.availabilityNote ? "Ask at Farm" : "Sold Out") : "Add to Cart";

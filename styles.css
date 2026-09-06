@@ -407,6 +407,7 @@ body{padding-top:var(--header-h);}
 .detail-body h2{font-size:28px; margin-top:4px;}
 .detail-price{font-size:19px; font-weight:700; color:var(--ink);}
 .detail-availability{font-size:13.5px; font-weight:600;}
+.product-description{font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin-top:10px;}
 .detail-body .btn{margin-top:16px;}
 
 /* ---------------- Cart drawer ---------------- */
