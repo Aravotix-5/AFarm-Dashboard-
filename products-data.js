@@ -38,9 +38,9 @@ function categoryLabel(key){
 --------------------------------------------------------------------- */
 const PRODUCTS = [
   // ---- TOMATOES ----
-  { id:"tom-cherry",  name:"Cherry Tomatoes",         category:"tomatoes", price:5.99, unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:2, image:"media/images/cherry-tomatoes-vine.jpg", video:"media/videos/cherry-tomato-harvest.mp4",
+  { id:"tom-cherry",  name:"Cherry Tomatoes",         category:"tomatoes", price:5.99, unit:"quart", available:true, featured:true, basketEligible:true, basketSpace:2, image:"cherry-tomatoes-vine.jpg", video:"cherry-tomato-harvest.mp4",
     description:"Small, sweet, and juicy with thin skins — good for snacking, salads, or roasting whole. A source of vitamin C." },
-  { id:"tom-bigboy",  name:"Big Boy Tomatoes",        category:"tomatoes", price:4.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"media/images/tomato-ripening.jpg", video:"media/videos/tomato-ripening.mp4",
+  { id:"tom-bigboy",  name:"Big Boy Tomatoes",        category:"tomatoes", price:4.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"tomato-ripening.jpg", video:"tomato-ripening.mp4",
     description:"A classic slicing tomato — meaty, mildly sweet, and juicy. Good on sandwiches, burgers, or in a fresh salad." },
   { id:"tom-long",    name:"Long Tomatoes",           category:"tomatoes", price:5.49, unit:"quart", available:true, basketEligible:true, basketSpace:2,
     description:"Elongated and firm-fleshed with fewer seeds than round tomatoes, holding their shape well when cooked into sauces." },
@@ -58,19 +58,19 @@ const PRODUCTS = [
     description:"Crisp, juicy, and mild with no heat. Good raw in salads or cooked in stir-fries. A source of vitamin C." },
   { id:"pep-habanero", name:"Habanero",           category:"peppers", price:8.99, unit:"quart", available:true, basketEligible:true, basketSpace:1,
     description:"Very hot with a fruity, floral note. Use in small amounts in salsas, hot sauces, or marinades." },
-  { id:"pep-green",    name:"Green Chili",        category:"peppers", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false, image:"media/images/green-chili-plant.jpg", video:"media/videos/green-chili-harvest.mp4",
+  { id:"pep-green",    name:"Green Chili",        category:"peppers", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false, image:"green-chili-plant.jpg", video:"green-chili-harvest.mp4",
     description:"A slender, medium-hot green chili used fresh for a sharp, grassy heat in cooking." },
 
   // ---- VEGETABLES ----
-  { id:"veg-cabbage",  name:"Cabbage",             category:"vegetables", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false, image:"media/images/cabbage-head.jpg", video:"media/videos/cabbage-harvest.mp4",
+  { id:"veg-cabbage",  name:"Cabbage",             category:"vegetables", price:null, unit:"quart", priceNote:"Price information needed", availabilityNote:"INFORMATION NEEDED", basketEligible:false, image:"cabbage-head.jpg", video:"cabbage-harvest.mp4",
     description:"Crisp and mild with a slight peppery bite raw, sweeter when cooked. Good in slaws, stir-fries, or soups." },
-  { id:"veg-eggplant", name:"Eggplant",            category:"vegetables", price:4.99, unit:"each", available:true, basketEligible:true, basketSpace:2, image:"media/images/eggplant-plant.jpg", video:"media/videos/eggplant-harvest.mp4",
+  { id:"veg-eggplant", name:"Eggplant",            category:"vegetables", price:4.99, unit:"each", available:true, basketEligible:true, basketSpace:2, image:"eggplant-plant.jpg", video:"eggplant-harvest.mp4",
     description:"Tender with a mild, slightly earthy flavor that takes on seasoning well. Good roasted, grilled, or in curries." },
-  { id:"veg-karela",   name:"Karela (Bitter Melon)",category:"vegetables", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"media/images/karela-closeup.jpg", video:"media/videos/cese-loofah-harvest.mp4",
+  { id:"veg-karela",   name:"Karela (Bitter Melon)",category:"vegetables", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"karela-closeup.jpg", video:"cese-loofah-harvest.mp4",
     description:"Distinctly bitter with a crunchy texture. A staple in South Asian cooking, often stir-fried with onions and spices to balance the bitterness." },
 
   // ---- SQUASH & ZUCCHINI ----
-  { id:"sq-bottle",    name:"Bottle Gourd",         category:"squash", price:5.99, unit:"each", available:true, basketEligible:true, basketSpace:4, image:"media/images/bottle-gourd-single.jpg", video:"media/videos/bottle-gourd-harvest.mp4",
+  { id:"sq-bottle",    name:"Bottle Gourd",         category:"squash", price:5.99, unit:"each", available:true, basketEligible:true, basketSpace:4, image:"bottle-gourd-single.jpg", video:"bottle-gourd-harvest.mp4",
     description:"Mild and mellow with a soft texture once cooked. Commonly used in soups, curries, and stews." },
   { id:"zuc-american", name:"American Zucchini",    category:"squash", price:3.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:2,
     description:"Mild, tender, and slightly sweet — good sautéed, grilled, or baked into breads." },
@@ -82,7 +82,7 @@ const PRODUCTS = [
     description:"Deep-skinned and mild, tender when cooked — versatile in stir-fries or baked dishes." },
 
   // ---- BEANS ----
-  { id:"bean-green", name:"Green Beans",         category:"beans", price:4.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:1, image:"media/images/green-beans-harvest.jpg", video:"media/videos/green-beans-harvest.mp4",
+  { id:"bean-green", name:"Green Beans",         category:"beans", price:4.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:1, image:"green-beans-harvest.jpg", video:"green-beans-harvest.mp4",
     description:"Crisp and snappy with a fresh, grassy flavor. Good steamed, sautéed, or added to stir-fries. A source of fiber." },
   { id:"bean-lima",  name:"Lima Beans",          category:"beans", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:1,
     description:"Starchy and creamy once cooked, with a mild, buttery flavor — good in soups and stews." },
@@ -92,7 +92,7 @@ const PRODUCTS = [
   // ---- OKRA ----
   { id:"okra-crimson", name:"Crimson Okra", category:"okra", price:5.99, unit:"quart", available:true, seasonal:true, basketEligible:true, basketSpace:2,
     description:"Tender pods with a mild, slightly grassy flavor — good sautéed, roasted, or added to stews." },
-  { id:"okra-emerald", name:"Emerald Okra", category:"okra", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"media/images/okra-pods.jpg", video:"media/videos/okra-harvest.mp4",
+  { id:"okra-emerald", name:"Emerald Okra", category:"okra", price:5.99, unit:"quart", available:true, basketEligible:true, basketSpace:2, image:"okra-pods.jpg", video:"okra-harvest.mp4",
     description:"Crisp and mild, becomes tender when cooked — a common addition to gumbo, curries, and stir-fries." },
 
   // ---- HERBS & LEAVES ----
