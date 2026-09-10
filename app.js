@@ -100,20 +100,43 @@ function mediaPlaceholderText(p){
 
 /* Fills a container with the product's real photo/video when available,
    autoplaying muted video if present, falling back to a text placeholder. */
+/* Builds a real <video> element with every attribute iOS Safari needs
+   to reliably autoplay muted, inline video — some browsers only honor
+   the "muted" HTML attribute (not just the JS property) at load time,
+   which is why video sometimes played in one spot but not another. */
+function createVideoEl(src, name, withControls){
+  const v = document.createElement("video");
+  v.setAttribute("muted", "");
+  v.setAttribute("playsinline", "");
+  v.setAttribute("webkit-playsinline", "");
+  v.muted = true;
+  v.loop = true;
+  v.playsInline = true;
+  v.autoplay = true;
+  v.setAttribute("aria-label", name);
+  if(withControls) v.controls = true;
+  v.src = src;
+  return v;
+}
+
+/* Fills a container with the product's real photo/video. Pass
+   opts.gallery to show BOTH (video + photo) as a swipeable-by-dots
+   mini gallery — used on the product detail page. Everywhere else
+   (cards, cart thumbnails) shows just one item, preferring video. */
 function fillMediaEl(container, p, opts){
   opts = opts || {};
   container.innerHTML = "";
-  if(p.video){
-    const v = document.createElement("video");
-    v.src = p.video;
-    v.muted = true;
-    v.loop = true;
-    v.playsInline = true;
-    v.autoplay = true;
-    v.setAttribute("aria-label", p.name);
-    if(opts.controls) v.controls = true;
-    container.appendChild(v);
-  } else if(p.image){
+  container.classList.remove("media-gallery");
+  const hasVideo = !!p.video;
+  const hasImage = !!p.image;
+
+  if(opts.gallery && hasVideo && hasImage){
+    renderMediaGallery(container, p);
+    return;
+  }
+  if(hasVideo){
+    container.appendChild(createVideoEl(p.video, p.name, opts.controls));
+  } else if(hasImage){
     const img = document.createElement("img");
     img.src = p.image;
     img.alt = p.name;
@@ -122,6 +145,41 @@ function fillMediaEl(container, p, opts){
   } else {
     container.appendChild(el("span", "media-placeholder", mediaPlaceholderText(p)));
   }
+}
+
+function renderMediaGallery(container, p){
+  container.classList.add("media-gallery");
+  const slides = [
+    { type: "video", src: p.video },
+    { type: "image", src: p.image }
+  ];
+  const slideWrap = el("div", "media-gallery-slide");
+  const dotsWrap = el("div", "media-gallery-dots");
+  const dots = slides.map((s, i) => {
+    const dot = document.createElement("button");
+    dot.className = "media-gallery-dot";
+    dot.setAttribute("aria-label", "Show " + (s.type === "video" ? "video" : "photo"));
+    dot.addEventListener("click", () => showSlide(i));
+    dotsWrap.appendChild(dot);
+    return dot;
+  });
+  function showSlide(i){
+    slideWrap.innerHTML = "";
+    const s = slides[i];
+    if(s.type === "video"){
+      slideWrap.appendChild(createVideoEl(s.src, p.name, true));
+    } else {
+      const img = document.createElement("img");
+      img.src = s.src;
+      img.alt = p.name;
+      img.loading = "lazy";
+      slideWrap.appendChild(img);
+    }
+    dots.forEach((d, idx) => d.classList.toggle("active", idx === i));
+  }
+  container.appendChild(slideWrap);
+  container.appendChild(dotsWrap);
+  showSlide(0);
 }
 
 function el(tag, className, html){
@@ -384,7 +442,7 @@ function renderProductPage(id){
     availEl.style.color = "var(--ink-soft)";
   }
 
-  fillMediaEl(document.getElementById("productPageMedia"), p, { controls: !!p.video });
+  fillMediaEl(document.getElementById("productPageMedia"), p, { controls: true, gallery: true });
 
   document.getElementById("productPageDescription").textContent = p.description || "";
 
